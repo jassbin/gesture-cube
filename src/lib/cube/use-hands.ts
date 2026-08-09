@@ -75,13 +75,9 @@ export function useHandTracking(cbs: Callbacks) {
   const smIndex = useRef<{ x: number; y: number } | null>(null);
   // FREE / LOCKED face state machine
   const lockState = useRef<"free" | "locked">("free");
-  const lockSpan = useRef(0.15);
-  const prevTier = useRef(0);
   const stillSince = useRef(0);
   const prevMid = useRef<{ x: number; y: number } | null>(null);
   const lockTwistStart = useRef<{ x: number; y: number } | null>(null);
-  // hand size captured when a pinch begins → baseline for depth ("far=small")
-  const pinchBaseSpan = useRef(0);
 
   const stop = useCallback(() => {
     runningRef.current = false;
@@ -128,17 +124,6 @@ export function useHandTracking(cbs: Callbacks) {
         if (!pinchState.current && ratio < 0.5) pinchState.current = true;
         else if (pinchState.current && ratio > 0.75) pinchState.current = false;
         const pinching = pinchState.current;
-
-        // capture the baseline hand size at the moment a pinch begins, then
-        // report depth = current / baseline. >1 = hand grew (closer → outer
-        // layer), <1 = hand shrank (farther → inner layer).
-        if (pinching && pinchBaseSpan.current === 0) {
-          pinchBaseSpan.current = handSpan;
-        } else if (!pinching) {
-          pinchBaseSpan.current = 0;
-        }
-        const depth =
-          pinchBaseSpan.current > 0 ? handSpan / pinchBaseSpan.current : 1;
 
         // low-pass filter the two touch points (rear camera → no mirror)
         const rawThumb = { x: pts[4].x, y: pts[4].y };
@@ -198,7 +183,7 @@ export function useHandTracking(cbs: Callbacks) {
           landmarks: pts.map((p) => ({ x: p.x, y: p.y })),
           pinching,
           locked,
-          depth,
+          depth: 1,
           pinchX: mx,
           pinchY: my,
           thumbX,
