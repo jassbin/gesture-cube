@@ -107,24 +107,67 @@ export function useHandTracking(cbs: Callbacks) {
           fps,
         });
 
-        const prev = prevPalm.current;
-        if (prev) {
-          const dx = cx - prev.x;
-          const dy = cy - prev.y;
-          const dt = now - prev.t;
-          cbRef.current.onSpin?.(dx * 3.2, dy * 3.2);
-          const speed = Math.hypot(dx, dy) / Math.max(dt, 1);
-          if (speed > 0.0022 && now - lastSwipe.current > 650) {
-            lastSwipe.current = now;
-            let dir: SwipeDir;
-            if (Math.abs(dx) > Math.abs(dy)) dir = dx > 0 ? "right" : "left";
-            else dir = dy > 0 ? "down" : "up";
-            cbRef.current.onSwipe?.(dir);
+        // --- pose detection: is the index finger "pointing" (twist pointer)? ---
+        const dist = (a: { x: number; y: number }, b: { x: number; y: number }) =>
+          Math.hypot(a.x - b.x, a.y - b.y);
+        const wrist = pts[0];
+        const indexExtended = dist(pts[8], wrist) > dist(pts[6], wrist);
+        const middleFolded = dist(pts[12], wrist) < dist(pts[10], wrist);
+        const pointing = indexExtended && middleFolded;
+
+        // index fingertip in mirrored screen space (matches what user sees)
+        const fx = 1 - pts[8].x;
+        const fy = pts[8].y;
+
+        if (pointing) {
+          // reset any whole-cube spin baseline while pointing
+          prevPalm.current = null;
+          const d = dragRef.current;
+          if (!d || !d.active) {
+            dragRef.current = {
+              active: true,
+              startX: fx,
+              startY: fy,
+              lastX: fx,
+              lastY: fy,
+              lastMoveT: now,
+            };
+          } else {
+            const total = Math.hypot(fx - d.startX, fy - d.startY);
+            const stepMove = Math.hypot(fx - d.lastX, fy - d.lastY);
+            if (stepMove > 0.004) d.lastMoveT = now;
+            d.lastX = fx;
+            d.lastY = fy;
+            // Commit a twist when the drag is long enough and either the finger
+            // paused (end of stroke) or it got quite large — then cooldown.
+            const paused = now - d.lastMoveT > 130;
+            const longEnough = total > 0.07;
+            if (longEnough && (paused || total > 0.18) &&
+                now - lastTwist.current > 500) {
+              lastTwist.current = now;
+              cbRef.current.onFingerTwist?.({
+                startX: d.startX,
+                startY: d.startY,
+                dx: fx - d.startX,
+                dy: fy - d.startY,
+              });
+              d.active = false;
+            }
           }
+        } else {
+          // open hand → whole-cube spin from palm motion
+          dragRef.current = null;
+          const prev = prevPalm.current;
+          if (prev) {
+            const dx = cx - prev.x;
+            const dy = cy - prev.y;
+            cbRef.current.onSpin?.(dx * 3.2, dy * 3.2);
+          }
+          prevPalm.current = { x: cx, y: cy, t: now };
         }
-        prevPalm.current = { x: cx, y: cy, t: now };
       } else {
         prevPalm.current = null;
+        dragRef.current = null;
         cbRef.current.onFrame?.({
           present: false,
           x: 0.5,
