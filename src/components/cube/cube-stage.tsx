@@ -198,7 +198,6 @@ export function CubeStage() {
         frame.indexX,
         frame.indexY,
         frame.locked, // freeze only after locking
-        frame.depth,
       );
       grabbedFace.current = hit && frame.locked ? scene.grabbedFace() : null;
     } else {
