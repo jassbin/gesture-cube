@@ -313,6 +313,39 @@ export class CubeScene {
     return best ? { axis: best.axis, sign: best.sign } : null;
   }
 
+  // Of a cubie's OUTER faces (the axes where its coord is ±1), return the one
+  // whose outward world normal points most toward the camera — i.e. the face
+  // the user is actually looking at / touching from the front.
+  private frontFaceOfCubie(
+    cubie: { x: number; y: number; z: number; mesh: THREE.Object3D },
+    camPos: THREE.Vector3,
+  ): { axis: "x" | "y" | "z"; sign: number } | null {
+    const rootQ = new THREE.Quaternion();
+    this.root.getWorldQuaternion(rootQ);
+    const cubiePos = new THREE.Vector3();
+    cubie.mesh.getWorldPosition(cubiePos);
+    const toCam = camPos.clone().sub(cubiePos).normalize();
+    const candidates: { axis: "x" | "y" | "z"; sign: number }[] = [];
+    if (cubie.x !== 0) candidates.push({ axis: "x", sign: Math.sign(cubie.x) });
+    if (cubie.y !== 0) candidates.push({ axis: "y", sign: Math.sign(cubie.y) });
+    if (cubie.z !== 0) candidates.push({ axis: "z", sign: Math.sign(cubie.z) });
+    let best: { axis: "x" | "y" | "z"; sign: number } | null = null;
+    let bestDot = -Infinity;
+    for (const c of candidates) {
+      const n = new THREE.Vector3(
+        c.axis === "x" ? c.sign : 0,
+        c.axis === "y" ? c.sign : 0,
+        c.axis === "z" ? c.sign : 0,
+      ).applyQuaternion(rootQ); // logical normal → world normal
+      const dot = n.dot(toCam);
+      if (dot > bestDot) {
+        bestDot = dot;
+        best = c;
+      }
+    }
+    return best;
+  }
+
   private pinchSamples(
     thumbX: number,
     thumbY: number,
