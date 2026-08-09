@@ -56,7 +56,7 @@
       "gesture": "GESTURE",
       "touch": "TOUCH",
       "coord": "COORD",
-      "handReadyBanner": "Hand locked · wave to rotate",
+      "handReadyBanner": "Face locked · pinch & turn it",
       "handNoneBanner": "No hand · raise it to the camera",
       "flashRotate": "↻ Rotating",
       "flashTwist": "⤾ Twist"
