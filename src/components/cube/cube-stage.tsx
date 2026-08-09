@@ -395,7 +395,7 @@ export function CubeStage() {
             </p>
           ) : (
             <p className="fui-mono text-[10px] uppercase tracking-wider text-secondary/90">
-              {t("play.experimentalSwipe")}
+              {frame?.palm ? t("play.palmSpin") : t("play.experimentalSwipe")}
             </p>
           )}
         </div>
