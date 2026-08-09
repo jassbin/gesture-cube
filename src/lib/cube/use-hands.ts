@@ -161,7 +161,6 @@ export function useHandTracking(cbs: Callbacks) {
             if (stillSince.current === 0) stillSince.current = now;
             else if (now - stillSince.current > 420) {
               lockState.current = "locked";
-              lockSpan.current = handSpan;
               lockTwistStart.current = { x: mx, y: my };
             }
           } else {
