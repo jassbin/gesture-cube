@@ -372,14 +372,20 @@ export class CubeScene {
     }
     const axis = stableKey[0] as "x" | "y" | "z";
     const sign = stableKey.slice(1) === "-1" ? -1 : 1;
-    const key = stableKey;
+    // depth chooses which parallel slice ALONG the face normal we grab:
+    // tier 0 (hand near/neutral) = outer face slice  (coord = sign)
+    // tier 1 (slight pull-back)  = middle slice       (coord = 0)
+    // tier 2 (clear pull-back)   = far/inner slice     (coord = -sign)
+    const tier = CubeScene.depthTier(depth);
+    const lyr = tier === 0 ? sign : tier === 1 ? 0 : -sign;
+    const key = `${axis}:${sign}:${lyr}`;
 
-    // (1) whole-face soft highlight — rebuild only when the grabbed face changes
+    // (1) whole-face soft highlight — rebuild only when the grabbed slice changes
     if (key !== this.hlKey) {
       this.clearFaceBodies();
       const layerCubies = this.cubies.filter((c) => {
-        const v = axis === "x" ? c.x : axis === "y" ? c.y : c.z;
-        return v === sign;
+        const coord = axis === "x" ? c.x : axis === "y" ? c.y : c.z;
+        return coord === lyr;
       });
       for (const c of layerCubies) {
         const body = c.mesh.children.find(
