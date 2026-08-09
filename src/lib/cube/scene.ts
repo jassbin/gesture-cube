@@ -37,8 +37,6 @@ function makeSticker(color: number, size: number): THREE.Mesh {
     roughness: 0.35,
     metalness: 0.1,
     emissive: new THREE.Color(color).multiplyScalar(0.06),
-    transparent: true,
-    opacity: 0.78,
   });
   return new THREE.Mesh(geo, mat);
 }
@@ -68,7 +66,7 @@ export class CubeScene {
     this.renderer.setClearColor(0x000000, 0);
     this.scene = new THREE.Scene();
     this.camera = new THREE.PerspectiveCamera(38, 1, 0.1, 100);
-    this.camera.position.set(0, 0, 30);
+    this.camera.position.set(0, 0, 24);
 
     this.root = new THREE.Group();
     this.root.rotation.set(-0.5, 0.6, 0);
@@ -628,7 +626,7 @@ export class CubeScene {
     // the camera physically orbits the fixed cube instead of only rotating it.
     this.camera.position.x = this.parallax.y * 3.2;
     this.camera.position.y = -this.parallax.x * 3.2;
-    this.camera.position.z = 30 - Math.abs(this.parallax.x + this.parallax.y) * 0.6;
+    this.camera.position.z = 24 - Math.abs(this.parallax.x + this.parallax.y) * 0.6;
     this.camera.lookAt(0, 0, 0);
 
     this.renderer.render(this.scene, this.camera);
