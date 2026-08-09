@@ -100,69 +100,71 @@ export function useHandTracking(cbs: Callbacks) {
         const pts = hands[0];
         const cx = (pts[0].x + pts[9].x) / 2;
         const cy = (pts[0].y + pts[9].y) / 2;
+
+        const dist = (a: { x: number; y: number }, b: { x: number; y: number }) =>
+          Math.hypot(a.x - b.x, a.y - b.y);
+
+        // --- pinch detection: thumb tip (4) close to index tip (8) ---
+        // Scale threshold by hand size (wrist→index-mcp) so it works at any
+        // distance from the camera.
+        const handSpan = dist(pts[0], pts[5]) || 0.15;
+        const pinchGap = dist(pts[4], pts[8]);
+        const pinching = pinchGap < handSpan * 0.55;
+
+        // pinch midpoint in mirrored screen space (what the user sees)
+        const mx = 1 - (pts[4].x + pts[8].x) / 2;
+        const my = (pts[4].y + pts[8].y) / 2;
+
         cbRef.current.onFrame?.({
           present: true,
           x: cx,
           y: cy,
           landmarks: pts.map((p) => ({ x: p.x, y: p.y })),
+          pinching,
           fps,
         });
 
-        // --- pose detection: is the index finger "pointing" (twist pointer)? ---
-        const dist = (a: { x: number; y: number }, b: { x: number; y: number }) =>
-          Math.hypot(a.x - b.x, a.y - b.y);
-        const wrist = pts[0];
-        const indexExtended = dist(pts[8], wrist) > dist(pts[6], wrist);
-        const middleFolded = dist(pts[12], wrist) < dist(pts[10], wrist);
-        const pointing = indexExtended && middleFolded;
-
-        // index fingertip in mirrored screen space (matches what user sees)
-        const fx = 1 - pts[8].x;
-        const fy = pts[8].y;
-
-        if (pointing) {
-          // reset any whole-cube spin baseline while pointing
+        if (pinching) {
+          // grabbing a face: pause whole-cube spin and track the drag
           prevPalm.current = null;
           const d = dragRef.current;
           if (!d || !d.active) {
             dragRef.current = {
               active: true,
-              startX: fx,
-              startY: fy,
-              lastX: fx,
-              lastY: fy,
+              startX: mx,
+              startY: my,
+              lastX: mx,
+              lastY: my,
               lastMoveT: now,
             };
           } else {
-            const total = Math.hypot(fx - d.startX, fy - d.startY);
-            const stepMove = Math.hypot(fx - d.lastX, fy - d.lastY);
-            if (stepMove > 0.004) d.lastMoveT = now;
-            d.lastX = fx;
-            d.lastY = fy;
-            // Commit a twist when the drag is long enough and either the finger
-            // paused (end of stroke) or it got quite large — then cooldown.
-            const paused = now - d.lastMoveT > 130;
-            const longEnough = total > 0.07;
-            if (longEnough && (paused || total > 0.18) &&
-                now - lastTwist.current > 500) {
+            d.lastX = mx;
+            d.lastY = my;
+          }
+        } else {
+          // released: if we were pinching and dragged far enough, twist once
+          const d = dragRef.current;
+          if (d && d.active) {
+            const dx = d.lastX - d.startX;
+            const dy = d.lastY - d.startY;
+            const total = Math.hypot(dx, dy);
+            if (total > 0.05 && now - lastTwist.current > 400) {
               lastTwist.current = now;
               cbRef.current.onFingerTwist?.({
                 startX: d.startX,
                 startY: d.startY,
-                dx: fx - d.startX,
-                dy: fy - d.startY,
+                dx,
+                dy,
               });
-              d.active = false;
             }
+            dragRef.current = null;
           }
-        } else {
           // open hand → whole-cube spin from palm motion
-          dragRef.current = null;
           const prev = prevPalm.current;
           if (prev) {
-            const dx = cx - prev.x;
-            const dy = cy - prev.y;
-            cbRef.current.onSpin?.(dx * 3.2, dy * 3.2);
+            const sdx = cx - prev.x;
+            const sdy = cy - prev.y;
+            cbRef.current.onSpin?.(sdx * 3.2, sdy * 3.2);
           }
           prevPalm.current = { x: cx, y: cy, t: now };
         }
@@ -174,6 +176,7 @@ export function useHandTracking(cbs: Callbacks) {
           x: 0.5,
           y: 0.5,
           landmarks: [],
+          pinching: false,
           fps,
         });
       }
