@@ -381,40 +381,39 @@ export function CubeStage() {
         />
       )}
 
-      {/* single bottom status line — never overlaps the cube */}
-      {mode === "gesture" && cameraActive && (
-        <div className="pointer-events-none absolute inset-x-0 bottom-[150px] z-20 px-8 text-center">
-          {frame?.pinching ? (
-            <p
-              className={cn(
-                "fui-mono text-xs font-semibold tracking-wide",
-                frame.locked ? "text-[#ff8c00]" : "text-[#ffd54a]",
-              )}
-            >
-              {frame.locked ? t("play.faceLocked") : t("play.pinchHold")}
-            </p>
-          ) : (
-            <p className="fui-mono text-[10px] uppercase tracking-wider text-secondary/90">
-              {frame?.palm ? t("play.palmSpin") : t("play.experimentalSwipe")}
-            </p>
-          )}
-        </div>
-      )}
-      {mode === "touch" && (
-        <div className="pointer-events-none absolute inset-x-0 bottom-[150px] z-20 px-8 text-center">
-          <p className="fui-mono text-[10px] uppercase tracking-wider text-white/60">
-            {t("play.twistHint")}
-          </p>
-        </div>
-      )}
-
-      {/* bottom controls (above the nav) */}
+      {/* unified bottom bar: status line + controls, snug above the nav so
+          the whole middle stays open for the cube */}
       <div
         data-el="cube-controls"
-        className="absolute inset-x-0 z-30 flex flex-col items-center gap-3 px-4 py-2"
-        style={{ bottom: "104px" }}
+        className="pointer-events-none absolute inset-x-0 bottom-0 z-30 flex flex-col items-center gap-2 px-4 pb-[84px] pt-2"
       >
-        <div className="grid w-full max-w-sm grid-cols-3 gap-2">
+        {mode === "gesture" && cameraActive && (
+          <div className="px-4 text-center">
+            {frame?.pinching ? (
+              <p
+                className={cn(
+                  "fui-mono text-xs font-semibold tracking-wide",
+                  frame.locked ? "text-[#ff8c00]" : "text-[#ffd54a]",
+                )}
+              >
+                {frame.locked ? t("play.faceLocked") : t("play.pinchHold")}
+              </p>
+            ) : (
+              <p className="fui-mono text-[10px] uppercase tracking-wider text-secondary/90">
+                {frame?.palm ? t("play.palmSpin") : t("play.experimentalSwipe")}
+              </p>
+            )}
+          </div>
+        )}
+        {mode === "touch" && (
+          <div className="px-4 text-center">
+            <p className="fui-mono text-[10px] uppercase tracking-wider text-white/60">
+              {t("play.twistHint")}
+            </p>
+          </div>
+        )}
+
+        <div className="pointer-events-auto grid w-full max-w-sm grid-cols-3 gap-2">
           <ControlButton
             el="btn-scramble"
             icon={<Shuffle className="h-4 w-4" />}
