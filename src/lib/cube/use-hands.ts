@@ -14,6 +14,8 @@ export type HandFrame = {
   x: number;
   y: number;
   landmarks: { x: number; y: number }[];
+  // true while thumb + index are pinched together (grabbing a face)
+  pinching: boolean;
   fps: number;
 };
 
