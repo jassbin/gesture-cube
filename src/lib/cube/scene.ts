@@ -397,15 +397,18 @@ export class CubeScene {
   }
 
   // Update the two bright "touched cube" markers under each fingertip.
+  // `depth` (hand-size ratio) picks how deep along the ray we select: >1 keeps
+  // the front (outer) cube, <1 pushes selection into inner cubes ("far=small").
   private refreshTips(
     thumbX: number,
     thumbY: number,
     indexX: number,
     indexY: number,
+    depth = 1,
   ) {
     this.clearTipBodies();
-    const tThumb = this.bodyAt(thumbX, thumbY);
-    const tIndex = this.bodyAt(indexX, indexY);
+    const tThumb = this.bodyAtDepth(thumbX, thumbY, depth);
+    const tIndex = this.bodyAtDepth(indexX, indexY, depth);
     for (const body of [tThumb, tIndex]) {
       if (!body) continue;
       const m = body.material as THREE.MeshStandardMaterial;
