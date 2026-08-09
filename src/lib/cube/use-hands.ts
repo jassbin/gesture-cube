@@ -19,6 +19,11 @@ export type HandFrame = {
   // pinch midpoint in mirrored screen space (0..1), valid while pinching
   pinchX: number;
   pinchY: number;
+  // thumb tip (4) and index tip (8) in mirrored screen space (0..1)
+  thumbX: number;
+  thumbY: number;
+  indexX: number;
+  indexY: number;
   fps: number;
 };
 
@@ -117,6 +122,10 @@ export function useHandTracking(cbs: Callbacks) {
         // pinch midpoint in mirrored screen space (what the user sees)
         const mx = 1 - (pts[4].x + pts[8].x) / 2;
         const my = (pts[4].y + pts[8].y) / 2;
+        const thumbX = 1 - pts[4].x;
+        const thumbY = pts[4].y;
+        const indexX = 1 - pts[8].x;
+        const indexY = pts[8].y;
 
         cbRef.current.onFrame?.({
           present: true,
@@ -126,6 +135,10 @@ export function useHandTracking(cbs: Callbacks) {
           pinching,
           pinchX: mx,
           pinchY: my,
+          thumbX,
+          thumbY,
+          indexX,
+          indexY,
           fps,
         });
 
