@@ -4,12 +4,12 @@ import * as THREE from "three";
 import type { Face, Move } from "@/lib/cube/model";
 
 const FACE_COLORS: Record<Face, number> = {
-  U: 0xffffff, // white
-  D: 0xffd700, // gold
-  F: 0x00ff88, // green
-  B: 0x1a4fff, // blue
-  R: 0xff3b30, // red
-  L: 0xff8c00, // orange
+  U: 0xcfcfcf, // deeper white / silver
+  D: 0xc79a00, // deep gold
+  F: 0x00b25f, // deep green
+  B: 0x1235b0, // deep blue
+  R: 0xc41f18, // deep red
+  L: 0xc76400, // deep orange
 };
 const PLASTIC = 0x0a1030;
 
