@@ -419,18 +419,36 @@ export class CubeScene {
   }
 
   // FREE-preview: show ONLY the two touched cubes, no whole-face highlight.
-  showTipsOnly(thumbX: number, thumbY: number, indexX: number, indexY: number) {
+  showTipsOnly(
+    thumbX: number,
+    thumbY: number,
+    indexX: number,
+    indexY: number,
+    depth = 1,
+  ) {
     this.clearFaceBodies(); // drop any face glow
     this.faceHist = [];
-    this.refreshTips(thumbX, thumbY, indexX, indexY);
+    this.refreshTips(thumbX, thumbY, indexX, indexY, depth);
   }
 
-  // the front-most cube body under a single screen point (0..1, mirrored)
-  private bodyAt(nx: number, ny: number): THREE.Mesh | null {
+  // Select a cube along the ray by depth. hits[] is sorted front→back.
+  // depth >= 1.08 → front cube; ~1 → 2nd; <= 0.94 → deepest reachable cube.
+  private bodyAtDepth(nx: number, ny: number, depth: number): THREE.Mesh | null {
     const ndc = new THREE.Vector2(nx * 2 - 1, -(ny * 2 - 1));
     this.raycaster.setFromCamera(ndc, this.camera);
-    const hit = this.raycaster.intersectObjects(this.pickables, false)[0];
-    return (hit?.object as THREE.Mesh) ?? null;
+    const hits = this.raycaster.intersectObjects(this.pickables, false);
+    if (hits.length === 0) return null;
+    let idx: number;
+    if (depth >= 1.08) idx = 0;
+    else if (depth >= 0.94) idx = 1;
+    else idx = hits.length - 1; // farthest reachable cube
+    idx = Math.min(idx, hits.length - 1);
+    return (hits[idx].object as THREE.Mesh) ?? null;
+  }
+
+  // front-most cube under a screen point (used for face voting)
+  private bodyAt(nx: number, ny: number): THREE.Mesh | null {
+    return this.bodyAtDepth(nx, ny, 1.2);
   }
 
   grabbedFace(): { axis: "x" | "y" | "z"; sign: number } | null {
