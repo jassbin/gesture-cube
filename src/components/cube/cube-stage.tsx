@@ -35,6 +35,18 @@ export function CubeStage() {
   const [mode, setMode] = useState<Mode>("touch");
   const [frame, setFrame] = useState<HandFrame | null>(null);
   const [displayTime, setDisplayTime] = useState("0.00");
+  const [gestureFlash, setGestureFlash] = useState<
+    { id: number; kind: "rotate" | "twist" } | null
+  >(null);
+  const flashSeq = useRef(0);
+  const lastRotateFlash = useRef(0);
+  const flashTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const showFlash = useCallback((kind: "rotate" | "twist") => {
+    flashSeq.current += 1;
+    setGestureFlash({ id: flashSeq.current, kind });
+    if (flashTimer.current) clearTimeout(flashTimer.current);
+    flashTimer.current = setTimeout(() => setGestureFlash(null), 700);
+  }, []);
   const game = useCubeGame();
   const gameRef = useRef(game);
   useEffect(() => {

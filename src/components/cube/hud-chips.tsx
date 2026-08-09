@@ -38,17 +38,74 @@ export function HudChips({
   moves,
   frame,
   mode,
+  gestureFlash,
 }: {
   time: string;
   moves: number;
   frame: HandFrame | null;
   mode: "gesture" | "touch";
+  gestureFlash?: { id: number; kind: "rotate" | "twist" } | null;
 }) {
   const { t } = useTranslation();
   const handOn = !!frame?.present;
 
   return (
     <>
+      {/* prominent gesture status banner — only in gesture mode */}
+      {mode === "gesture" && (
+        <div
+          data-el="hud-gesture-banner"
+          className="pointer-events-none absolute left-1/2 z-40 -translate-x-1/2"
+          style={{ top: "max(100px, calc(env(safe-area-inset-top, 0px) + 44px))" }}
+        >
+          <div
+            className={cn(
+              "fui-chip flex items-center gap-2.5 rounded-full px-4 py-2 text-sm font-semibold whitespace-nowrap",
+              handOn
+                ? "text-accent fui-status-pulse"
+                : "text-white/70",
+            )}
+            style={
+              handOn
+                ? { boxShadow: "0 0 0 1px rgba(0,255,136,0.55), 0 6px 26px rgba(0,255,136,0.32)" }
+                : undefined
+            }
+          >
+            {handOn ? (
+              <span className="relative flex h-4 w-4 items-center justify-center">
+                <span className="absolute inset-0 rounded-full border-2 border-accent/40 border-t-accent fui-track-ring" />
+                <span
+                  className="h-1.5 w-1.5 rounded-full bg-accent"
+                  style={{ boxShadow: "0 0 8px 2px rgba(0,255,136,0.9)" }}
+                />
+              </span>
+            ) : (
+              <span className="h-3 w-3 rounded-full bg-white/40" />
+            )}
+            {handOn
+              ? t("play.hud.handReadyBanner")
+              : t("play.hud.handNoneBanner")}
+          </div>
+        </div>
+      )}
+
+      {/* gesture-fired flash — big, unmissable, transient */}
+      {mode === "gesture" && gestureFlash && (
+        <div
+          key={gestureFlash.id}
+          data-el="hud-gesture-flash"
+          className="pointer-events-none absolute inset-x-0 top-[30%] z-40 flex justify-center"
+        >
+          <div className="fui-flash-pop fui-chip rounded-2xl px-6 py-3 text-2xl font-bold text-accent"
+            style={{ boxShadow: "0 0 0 1px rgba(0,255,136,0.5), 0 10px 40px rgba(0,255,136,0.4)" }}
+          >
+            {gestureFlash.kind === "twist"
+              ? t("play.hud.flashTwist")
+              : t("play.hud.flashRotate")}
+          </div>
+        </div>
+      )}
+
       {/* top-left cluster */}
       <div
         data-el="hud-top-left"
