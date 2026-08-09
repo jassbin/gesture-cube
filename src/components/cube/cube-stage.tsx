@@ -411,8 +411,8 @@ export function CubeStage() {
       {/* bottom controls (above the nav) */}
       <div
         data-el="cube-controls"
-        className="absolute inset-x-0 z-30 flex flex-col items-center gap-3 px-4"
-        style={{ bottom: "82px" }}
+        className="absolute inset-x-0 z-30 flex flex-col items-center gap-3 px-4 py-2"
+        style={{ bottom: "104px" }}
       >
         <div className="grid w-full max-w-sm grid-cols-3 gap-2">
           <ControlButton
