@@ -365,6 +365,11 @@ export class CubeScene {
   }
 
   clearFaceHighlight() {
+    this.clearTipBodies();
+    this.clearFaceBodies();
+  }
+
+  private clearFaceBodies() {
     for (const body of this.hlBodies) {
       const m = body.material as THREE.MeshStandardMaterial;
       m.emissive.setHex(0x000000);
@@ -372,6 +377,21 @@ export class CubeScene {
     }
     this.hlBodies = [];
     this.hlKey = null;
+  }
+
+  private clearTipBodies() {
+    for (const body of this.hlTipBodies) {
+      const m = body.material as THREE.MeshStandardMaterial;
+      if (this.hlBodies.includes(body)) {
+        // still part of the grabbed face → drop back to the soft face glow
+        m.emissive.setHex(0xffb020);
+        m.emissiveIntensity = 0.45;
+      } else {
+        m.emissive.setHex(0x000000);
+        m.emissiveIntensity = 0;
+      }
+    }
+    this.hlTipBodies = [];
   }
 
   private snapAxis(
