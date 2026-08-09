@@ -55,6 +55,17 @@ export function HandSkeleton({ frame }: { frame: HandFrame | null }) {
       // finger thickness scales with hand size on screen
       const handW = dist(scr[5], scr[17]) || 60;
       const thick = Math.max(18, handW * 0.42);
+      const thumbThick = thick * 1.4; // thumb is chunkier
+      // pull the thumb joints toward its base so it reads shorter / stubbier
+      const tBase = scr[2];
+      scr[3] = {
+        x: tBase.x + (scr[3].x - tBase.x) * 0.72,
+        y: tBase.y + (scr[3].y - tBase.y) * 0.72,
+      };
+      scr[4] = {
+        x: tBase.x + (scr[4].x - tBase.x) * 0.6,
+        y: tBase.y + (scr[4].y - tBase.y) * 0.6,
+      };
 
       // offscreen buffer at device pixels — compose the hand opaquely so the
       // palm fill and finger strokes union into one seamless shape
