@@ -169,6 +169,20 @@ export function CubeStage() {
     onFingerTwist,
   });
 
+  // ---- live face highlight while pinching (shows which face you're grabbing) ----
+  const [pinchHit, setPinchHit] = useState(false);
+  useEffect(() => {
+    const scene = sceneRef.current;
+    if (!scene) return;
+    if (mode === "gesture" && cameraActiveRef.current && frame?.pinching) {
+      const hit = scene.pickFaceAt(frame.pinchX, frame.pinchY);
+      setPinchHit(hit);
+    } else {
+      scene.clearFaceHighlight();
+      setPinchHit(false);
+    }
+  }, [frame, mode]);
+
   // ---- controls ----
   const handleScramble = useCallback(() => {
     if (scramblingRef.current || sceneRef.current?.isAnimating) return;
@@ -250,15 +264,15 @@ export function CubeStage() {
 
   return (
     <div className="fui-broadcast-field fixed inset-0 overflow-hidden">
-      {/* rear camera background */}
+      {/* front camera feed — used only as input for hand tracking, never
+          shown to the user. Kept in DOM (opacity 0) so MediaPipe can read it;
+          the FUI background color stays visible behind the cube + skeleton. */}
       <video
         ref={videoRef}
         playsInline
         muted
-        className={cn(
-          "absolute inset-0 h-full w-full object-cover transition-opacity duration-500",
-          cameraActive ? "opacity-100" : "opacity-0",
-        )}
+        aria-hidden
+        className="pointer-events-none absolute h-px w-px opacity-0"
         style={{ transform: "scaleX(-1)" }}
       />
       {/* dot grid overlay */}
