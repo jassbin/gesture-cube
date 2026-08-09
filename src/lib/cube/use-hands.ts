@@ -128,6 +128,17 @@ export function useHandTracking(cbs: Callbacks) {
         else if (pinchState.current && ratio > 0.75) pinchState.current = false;
         const pinching = pinchState.current;
 
+        // capture the baseline hand size at the moment a pinch begins, then
+        // report depth = current / baseline. >1 = hand grew (closer → outer
+        // layer), <1 = hand shrank (farther → inner layer).
+        if (pinching && pinchBaseSpan.current === 0) {
+          pinchBaseSpan.current = handSpan;
+        } else if (!pinching) {
+          pinchBaseSpan.current = 0;
+        }
+        const depth =
+          pinchBaseSpan.current > 0 ? handSpan / pinchBaseSpan.current : 1;
+
         // low-pass filter the two touch points (rear camera → no mirror)
         const rawThumb = { x: pts[4].x, y: pts[4].y };
         const rawIndex = { x: pts[8].x, y: pts[8].y };
