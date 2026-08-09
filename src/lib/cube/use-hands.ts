@@ -248,6 +248,7 @@ export function useHandTracking(cbs: Callbacks) {
           cbRef.current.onFingerRotateEnd?.();
         }
         pinchState.current = false;
+        pinchIntent.current = 0;
         lockState.current = "free";
         stillSince.current = 0;
         prevMid.current = null;
