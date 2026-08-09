@@ -56,6 +56,11 @@ export class CubeScene {
   private targetSpin = { x: 0, y: 0 };
   private animating = false;
   private disposed = false;
+  // live (1:1 finger-driven) face turn state
+  private livePivot: THREE.Group | null = null;
+  private liveLayer: Cubie[] = [];
+  private liveAxis: "x" | "y" | "z" = "x";
+  private liveSign = 1;
 
   constructor(private canvas: HTMLCanvasElement) {
     this.renderer = new THREE.WebGLRenderer({
