@@ -206,37 +206,63 @@ export class CubeScene {
     return this.axisLayerToMove(axis, layer, rotSign);
   }
 
-  // Highlight the cubie whose face is under the given screen point (0..1,
-  // as the user sees it). Returns true when a face is hit, false otherwise.
-  // Used to give a "you're grabbing this face" cue while pinching.
-  private hlBody: THREE.Mesh | null = null;
+  // Highlight the whole outer face under the given screen point (0..1, as the
+  // user sees it): all 9 cubies on the face the pinch is grabbing light up.
+  // Returns true when a face is hit, false otherwise.
+  private hlBodies: THREE.Mesh[] = [];
+  private hlKey: string | null = null;
   pickFaceAt(nx: number, ny: number): boolean {
     const ndc = new THREE.Vector2(nx * 2 - 1, -(ny * 2 - 1));
     this.raycaster.setFromCamera(ndc, this.camera);
     const hits = this.raycaster.intersectObjects(this.pickables, false);
-    const body = (hits[0]?.object as THREE.Mesh) ?? null;
-    if (body === this.hlBody) return !!body;
-    // clear previous
-    if (this.hlBody) {
-      const m = this.hlBody.material as THREE.MeshStandardMaterial;
-      m.emissive.setHex(0x000000);
-      m.emissiveIntensity = 0;
+    const hit = hits[0];
+    if (!hit || !hit.face) {
+      this.clearFaceHighlight();
+      return false;
     }
-    this.hlBody = body;
-    if (body) {
+    // world-space normal of the touched face → snap to nearest cube axis
+    const nWorld = hit.face.normal
+      .clone()
+      .transformDirection(hit.object.matrixWorld)
+      .normalize();
+    const face = this.snapAxis(nWorld);
+    if (!face) {
+      this.clearFaceHighlight();
+      return false;
+    }
+    const { axis, sign } = face;
+    const key = `${axis}${sign}`;
+    if (key === this.hlKey) return true; // already highlighting this face
+
+    this.clearFaceHighlight();
+    // select every cubie sitting on this outer layer
+    const layerCubies = this.cubies.filter((c) => {
+      const v = axis === "x" ? c.x : axis === "y" ? c.y : c.z;
+      return v === sign;
+    });
+    for (const c of layerCubies) {
+      // the body mesh is the first Mesh child carrying userData.cubie
+      const body = c.mesh.children.find(
+        (o) => (o as THREE.Mesh).isMesh && o.userData.cubie,
+      ) as THREE.Mesh | undefined;
+      if (!body) continue;
       const m = body.material as THREE.MeshStandardMaterial;
       m.emissive.setHex(0xffb020);
-      m.emissiveIntensity = 0.65;
+      m.emissiveIntensity = 0.7;
+      this.hlBodies.push(body);
     }
-    return !!body;
+    this.hlKey = key;
+    return true;
   }
 
   clearFaceHighlight() {
-    if (!this.hlBody) return;
-    const m = this.hlBody.material as THREE.MeshStandardMaterial;
-    m.emissive.setHex(0x000000);
-    m.emissiveIntensity = 0;
-    this.hlBody = null;
+    for (const body of this.hlBodies) {
+      const m = body.material as THREE.MeshStandardMaterial;
+      m.emissive.setHex(0x000000);
+      m.emissiveIntensity = 0;
+    }
+    this.hlBodies = [];
+    this.hlKey = null;
   }
 
   private snapAxis(
