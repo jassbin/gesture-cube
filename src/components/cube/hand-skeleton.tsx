@@ -3,23 +3,35 @@
 import { useEffect, useRef } from "react";
 import type { HandFrame } from "@/lib/cube/use-hands";
 
-// MediaPipe hand connections (finger bone chains) for the skeleton overlay.
-const FINGERS: number[][] = [
-  [0, 1, 2, 3, 4], // thumb
-  [0, 5, 6, 7, 8], // index
-  [9, 10, 11, 12], // middle
-  [13, 14, 15, 16], // ring
-  [0, 17, 18, 19, 20], // pinky
-];
-// Palm outline (wrist + finger bases) — filled translucently in palm mode.
-const PALM = [0, 5, 9, 13, 17];
+type Pt = { x: number; y: number };
+
+// Ordered ring of landmarks that traces a hand-shaped outline: down the
+// pinky side, across the fingertips, out to the thumb, then back along the
+// wrist. Gives a human-like silhouette (all five fingers included).
+const OUTLINE = [20, 19, 16, 12, 8, 7, 4, 3, 2, 1, 0, 17, 18];
+
+// Draw a smooth closed curve through points (midpoint quadratics).
+function smoothPath(ctx: CanvasRenderingContext2D, ring: Pt[]) {
+  if (ring.length < 3) return;
+  const mid = (a: Pt, b: Pt) => ({ x: (a.x + b.x) / 2, y: (a.y + b.y) / 2 });
+  ctx.beginPath();
+  const start = mid(ring[ring.length - 1], ring[0]);
+  ctx.moveTo(start.x, start.y);
+  for (let i = 0; i < ring.length; i++) {
+    const cur = ring[i];
+    const next = ring[(i + 1) % ring.length];
+    const m = mid(cur, next);
+    ctx.quadraticCurveTo(cur.x, cur.y, m.x, m.y);
+  }
+  ctx.closePath();
+}
 
 /**
  * Two display modes:
- *  - PALM mode (hand open, whole-cube rotation): a translucent hand —
- *    filled palm + finger skeleton + joint dots. No fingertip target dots.
- *  - PINCH / LOCK mode: only the two fingertip touch points (thumb + index),
- *    which is how a face is grabbed and turned.
+ *  - PALM mode (hand open, whole-cube rotation): a single translucent,
+ *    human-like hand SILHOUETTE — a soft filled outline, no skeleton lines
+ *    or joint dots, so it reads as a hand and isn't scary.
+ *  - PINCH / LOCK mode: only the two fingertip touch points (thumb + index).
  */
 export function HandSkeleton({ frame }: { frame: HandFrame | null }) {
   const ref = useRef<HTMLCanvasElement>(null);
@@ -40,48 +52,24 @@ export function HandSkeleton({ frame }: { frame: HandFrame | null }) {
     const W = rect.width;
     const H = rect.height;
     const lm = frame.landmarks;
-    const px = (p: { x: number }) => p.x * W;
-    const py = (p: { y: number }) => p.y * H;
+    const px = (p: Pt) => p.x * W;
+    const py = (p: Pt) => p.y * H;
 
     if (frame.palm) {
-      // ---- translucent hand (whole-cube rotation mode) ----
+      // ---- translucent human-like hand silhouette ----
       const c = "0,255,136";
-      // filled palm polygon
-      ctx.beginPath();
-      PALM.forEach((i, k) => {
-        const p = lm[i];
-        if (k === 0) ctx.moveTo(px(p), py(p));
-        else ctx.lineTo(px(p), py(p));
-      });
-      ctx.closePath();
-      ctx.fillStyle = `rgba(${c},0.14)`;
-      ctx.fill();
-
-      // finger bones
-      ctx.strokeStyle = `rgba(${c},0.55)`;
-      ctx.lineWidth = 6;
-      ctx.lineCap = "round";
+      const ring: Pt[] = OUTLINE.map((i) => ({ x: px(lm[i]), y: py(lm[i]) }));
       ctx.lineJoin = "round";
-      ctx.shadowColor = `rgba(${c},0.5)`;
-      ctx.shadowBlur = 12;
-      FINGERS.forEach((chain) => {
-        ctx.beginPath();
-        chain.forEach((i, k) => {
-          const p = lm[i];
-          if (k === 0) ctx.moveTo(px(p), py(p));
-          else ctx.lineTo(px(p), py(p));
-        });
-        ctx.stroke();
-      });
-
-      // joints
+      ctx.lineCap = "round";
+      ctx.shadowColor = `rgba(${c},0.45)`;
+      ctx.shadowBlur = 24;
+      smoothPath(ctx, ring);
+      ctx.fillStyle = `rgba(${c},0.16)`;
+      ctx.fill();
       ctx.shadowBlur = 0;
-      ctx.fillStyle = `rgba(${c},0.5)`;
-      lm.forEach((p) => {
-        ctx.beginPath();
-        ctx.arc(px(p), py(p), 5, 0, Math.PI * 2);
-        ctx.fill();
-      });
+      ctx.strokeStyle = `rgba(${c},0.5)`;
+      ctx.lineWidth = 3;
+      ctx.stroke();
       return;
     }
 
