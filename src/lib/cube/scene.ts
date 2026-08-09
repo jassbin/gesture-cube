@@ -643,24 +643,30 @@ export class CubeScene {
   // Snap to the nearest quarter turn, bake back into cubies, update logical
   // coords, and return the number of signed quarter turns applied (about the
   // +axis). Caller mirrors these into the logical cube state.
-  liveTurnEnd(angle: number): { axis: "x" | "y" | "z"; sign: number; quarters: number } | null {
+  liveTurnEnd(angle: number): Move[] {
     const pivot = this.livePivot;
-    if (!pivot) return null;
+    if (!pivot) return [];
     const quarters = Math.round(angle / (Math.PI / 2));
     const snapped = quarters * (Math.PI / 2);
     this.liveTurnUpdate(snapped);
     const layer = this.liveLayer;
     layer.forEach((c) => this.root.attach(c.mesh));
     this.root.remove(pivot);
-    // apply |quarters| logical 90° steps in the right direction
-    const dir = quarters >= 0 ? 1 : -1;
-    for (let i = 0; i < Math.abs(quarters); i++) {
-      this.updateLogicalPositions(layer, this.liveAxis, dir);
-    }
+    const axis = this.liveAxis;
+    const sign = this.liveSign;
     this.livePivot = null;
     this.liveLayer = [];
     this.animating = false;
-    return { axis: this.liveAxis, sign: this.liveSign, quarters };
+    if (quarters === 0) return [];
+    // Update the VISUAL cubie grid coords + build the matching logical Moves.
+    const dir = quarters >= 0 ? 1 : -1;
+    const move = this.axisLayerToMove(axis, sign, dir);
+    const moves: Move[] = [];
+    for (let i = 0; i < Math.abs(quarters); i++) {
+      this.updateLogicalPositions(layer, axis, dir);
+      moves.push(move);
+    }
+    return moves;
   }
 
   // Animate a face turn, resolves after visual completes. Caller applies logic.
