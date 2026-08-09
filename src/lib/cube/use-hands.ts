@@ -171,12 +171,11 @@ export function useHandTracking(cbs: Callbacks) {
           // Lock only once the chosen DEPTH LAYER has settled — so moving the
           // hand nearer/farther to pick outer/middle/inner never locks early.
           // tier: 0 outer / 1 middle / 2 inner (same bands as the scene).
-          const tier = depth >= 1.02 ? 0 : depth >= 0.88 ? 1 : 2;
+          // Pure 2D — lock once the pinch midpoint holds still for a moment.
+          // The face is chosen purely by where the two fingers sit on screen.
           const pm = prevMid.current;
           const moved = pm ? Math.hypot(mx - pm.x, my - pm.y) : 1;
-          const sameTier = tier === prevTier.current;
-          prevTier.current = tier;
-          if (moved < 0.02 && sameTier) {
+          if (moved < 0.02) {
             if (stillSince.current === 0) stillSince.current = now;
             else if (now - stillSince.current > 420) {
               lockState.current = "locked";
