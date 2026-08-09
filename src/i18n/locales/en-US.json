@@ -68,6 +68,7 @@
     },
     "experimentalSwipe": "Pinch the two fingers onto a face → hold still to lock that face → turn your two fingers to twist ONLY that face; open your fingers to unlock and pick another",
     "pinchHold": "Hold to lock",
+    "palmSpin": "Open palm · touch the cube and drag to rotate the whole cube",
     "faceLocked": "Face locked · turns this face only, open fingers to unlock",
     "layerNames": {
       "0": "Outer",
