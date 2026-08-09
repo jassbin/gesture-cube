@@ -199,6 +199,7 @@ export function useHandTracking(cbs: Callbacks) {
           landmarks: pts.map((p) => ({ x: p.x, y: p.y })),
           pinching,
           locked,
+          depth,
           pinchX: mx,
           pinchY: my,
           thumbX,
@@ -247,6 +248,7 @@ export function useHandTracking(cbs: Callbacks) {
         stillSince.current = 0;
         lockTwistStart.current = null;
         prevMid.current = null;
+        pinchBaseSpan.current = 0;
         smThumb.current = null;
         smIndex.current = null;
         cbRef.current.onFrame?.({
@@ -256,6 +258,7 @@ export function useHandTracking(cbs: Callbacks) {
           landmarks: [],
           pinching: false,
           locked: false,
+          depth: 1,
           pinchX: 0.5,
           pinchY: 0.5,
           thumbX: 0.5,
