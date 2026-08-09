@@ -23,7 +23,7 @@ export function GestureIntro({
   const steps = [
     { icon: Smartphone, key: "hold" },
     { icon: Hand, key: "pinch" },
-    { icon: RotateCw, key: "turn" },
+    { icon: RotateCw, key: "depth" },
   ] as const;
 
   return (
