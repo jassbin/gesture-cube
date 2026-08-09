@@ -71,6 +71,9 @@ export function CubeStage() {
   });
 
   // ---- process a visual+logical turn through the scene ----
+  const runTurnRef = useRef<(move: Move, isScramble?: boolean) => boolean>(
+    () => false,
+  );
   const runTurn = useCallback((move: Move, isScramble = false) => {
     const scene = sceneRef.current;
     if (!scene || scene.isAnimating) return false;
@@ -95,7 +98,7 @@ export function CubeStage() {
         // drain scramble queue
         if (queueRef.current.length > 0) {
           const next = queueRef.current.shift()!;
-          runTurn(next, true);
+          runTurnRef.current(next, true);
         } else if (scramblingRef.current) {
           scramblingRef.current = false;
           gameRef.current.markStart();
@@ -105,6 +108,9 @@ export function CubeStage() {
     );
     return true;
   }, []);
+  useEffect(() => {
+    runTurnRef.current = runTurn;
+  });
 
   // ---- hand tracking gesture handling ----
   const onSpin = useCallback((dx: number, dy: number) => {
