@@ -248,13 +248,20 @@ export class CubeScene {
       .multiplyScalar(dxN)
       .add(up.clone().multiplyScalar(-dyN))
       .normalize();
+    // A real cube face turns about ITS OWN normal axis. Grabbing a face and
+    // dragging tangentially spins that exact layer (the one we highlighted),
+    // never a perpendicular layer. The drag direction only decides the SIGN.
     const rot = new THREE.Vector3().crossVectors(nWorld, drag);
-    const axisInfo = this.snapAxis(rot);
-    if (!axisInfo) return null;
-    const { axis: rAxis, sign: rotSign } = axisInfo;
-    // grabbed an outer face → turn the outer layer on the rotation axis
-    const layer = sign;
-    return this.axisLayerToMove(rAxis, layer, rotSign);
+    // Project the intended rotation onto the grabbed face's normal axis so the
+    // layer that turns is always the selected face's layer (axis+sign).
+    const comp = axis === "x" ? rot.x : axis === "y" ? rot.y : rot.z;
+    if (Math.abs(comp) < 1e-4) return null;
+    // For a face at +normal, a screen drag maps to a turn about that normal.
+    // rotSign = orientation of the tangential drag around the face normal.
+    const tangentialRot = new THREE.Vector3().crossVectors(nWorld, drag);
+    const rotSign = tangentialRot.dot(nWorld) >= 0 ? 1 : -1;
+    // The layer that turns is the grabbed face's own layer.
+    return this.axisLayerToMove(axis, sign, rotSign);
   }
 
   // Highlight the whole outer face the pinch is grabbing. We sample several
