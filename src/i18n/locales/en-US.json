@@ -66,7 +66,7 @@
       "reset": "Reset",
       "mode": "Switch mode"
     },
-    "experimentalSwipe": "Experimental gesture — if a twist misses, swipe on a cube face instead",
+    "experimentalSwipe": "Point your index finger at a face and drag toward the way you want it to turn (experimental — tracking may wobble)",
     "solvedTitle": "Solved!",
     "solvedTime": "Time",
     "solvedMoves": "Moves",
