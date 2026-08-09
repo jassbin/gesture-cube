@@ -153,7 +153,6 @@ export function CubeStage() {
     [showFlash],
   );
 
-  const onFingerTwist = useCallback(
   // Live 1:1 finger rotation of the LOCKED face.
   const liveActiveRef = useRef(false);
   const liveAngleRef = useRef(0);
