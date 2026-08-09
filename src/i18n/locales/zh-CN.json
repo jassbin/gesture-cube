@@ -34,36 +34,56 @@
       "backHome": "返回首页"
     }
   },
-  "starter": {
-    "badge": "Eazo 应用模板",
-    "title": "用 Eazo 构建你的下一个应用",
-    "subtitle": "你现在拥有干净的基础：认证、数据访问与平台能力已就绪，可直接开发产品功能。",
-    "steps": {
-      "readDocs": {
-        "title": "阅读文档",
-        "desc": "打开 AGENTS.md 与 README.md，了解模板架构与约定。",
-        "code": "AGENTS.md + README.md"
-      },
-      "replacePage": {
-        "title": "替换本页",
-        "desc": "将产品 UI 放到 src/components 下，并保持 page.tsx 为薄入口。",
-        "code": "src/app/page.tsx"
-      },
-      "firstFeature": {
-        "title": "开发第一个功能",
-        "desc": "在 src/app/api 添加接口，并通过 src/lib/api 中的类型化 helper 调用。",
-        "code": "src/app/api/*"
-      },
-      "translations": {
-        "title": "补充翻译",
-        "desc": "在 src/i18n/locales 编辑中英文文案；layout 已接入 LanguageSwitcher 与 I18nProvider。",
-        "code": "src/i18n/locales/"
-      }
+  "nav": {
+    "play": "隔空魔方",
+    "records": "成绩"
+  },
+  "play": {
+    "enableGyro": "开启陀螺仪立体感",
+    "enableCamera": "开启摄像头手势",
+    "gyroHint": "点按以授权体感，转动手机即有立体视差",
+    "cameraHint": "将手伸到后置镜头前，挥掌旋转魔方",
+    "cameraDenied": "未获得摄像头，已切换为触屏操作",
+    "hud": {
+      "time": "计时",
+      "moves": "步数",
+      "hand": "手部",
+      "tracking": "追踪",
+      "fps": "帧率",
+      "handReady": "已锁定",
+      "handNone": "未检测",
+      "mode": "模式",
+      "gesture": "手势",
+      "touch": "触屏",
+      "coord": "坐标"
     },
-    "nextCommand": {
-      "title": "下一步命令",
-      "desc": "启动开发服务器，实时迭代你的产品。",
-      "command": "bun dev"
-    }
+    "controls": {
+      "scramble": "打乱",
+      "reset": "重置",
+      "mode": "模式切换"
+    },
+    "experimentalSwipe": "实验手势：识别可能不稳，拧不动时请在魔方面上滑动",
+    "solvedTitle": "还原完成！",
+    "solvedTime": "用时",
+    "solvedMoves": "步数",
+    "playAgain": "再来一局",
+    "viewRecords": "查看成绩",
+    "saving": "保存中…",
+    "signInToSave": "登录以保存成绩",
+    "twistHint": "在魔方任一面拖动即可拧动该层"
+  },
+  "records": {
+    "title": "还原成绩",
+    "subtitle": "你的历史用时与步数",
+    "best": "最佳",
+    "empty": "还没有成绩，去还原你的第一颗魔方吧",
+    "goPlay": "去把玩",
+    "time": "用时",
+    "moves": "步数",
+    "mode": "方式",
+    "gesture": "手势",
+    "touch": "触屏",
+    "signInPrompt": "登录后即可保存并查看你的成绩",
+    "share": "分享成绩"
   }
 }
