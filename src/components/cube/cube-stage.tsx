@@ -27,6 +27,9 @@ export function CubeStage() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
   const sceneRef = useRef<CubeScene | null>(null);
+  const grabbedFace = useRef<{ axis: "x" | "y" | "z"; sign: number } | null>(
+    null,
+  );
   const queueRef = useRef<Move[]>([]);
   const scramblingRef = useRef(false);
 
@@ -150,12 +153,17 @@ export function CubeStage() {
       if (mode !== "gesture" || scramblingRef.current) return;
       const scene = sceneRef.current;
       if (!scene) return;
-      const move = scene.solveTwistFromDrag(
-        twist.startX,
-        twist.startY,
-        twist.dx,
-        twist.dy,
-      );
+      // Prefer the face we've been highlighting (voted from both fingers), so
+      // the layer that turns is exactly the one shown as grabbed.
+      const face = grabbedFace.current;
+      const move = face
+        ? scene.solveTwistFromFace(face.axis, face.sign, twist.dx, twist.dy)
+        : scene.solveTwistFromDrag(
+            twist.startX,
+            twist.startY,
+            twist.dx,
+            twist.dy,
+          );
       if (!move) return;
       showFlash("twist");
       runTurn(move);
@@ -175,11 +183,18 @@ export function CubeStage() {
     const scene = sceneRef.current;
     if (!scene) return;
     if (mode === "gesture" && hands.status === "active" && frame?.pinching) {
-      const hit = scene.pickFaceAt(frame.pinchX, frame.pinchY);
+      const hit = scene.pickFaceAt(
+        frame.thumbX,
+        frame.thumbY,
+        frame.indexX,
+        frame.indexY,
+      );
       setPinchHit(hit);
+      grabbedFace.current = hit ? scene.grabbedFace() : null;
     } else {
       scene.clearFaceHighlight();
       setPinchHit(false);
+      grabbedFace.current = null;
     }
   }, [frame, mode, hands.status]);
 

@@ -338,7 +338,6 @@ export class CubeScene {
   }
 
   clearFaceHighlight() {
-    for (const body of this.hlBodies) {
       const m = body.material as THREE.MeshStandardMaterial;
       m.emissive.setHex(0x000000);
       m.emissiveIntensity = 0;
