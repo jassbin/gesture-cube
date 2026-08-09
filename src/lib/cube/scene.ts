@@ -257,7 +257,7 @@ export class CubeScene {
   private hlKey: string | null = null;
 
   private voteFace(
-    samples: { x: number; y: number }[],
+    samples: { x: number; y: number; w: number }[],
   ): { axis: "x" | "y" | "z"; sign: number } | null {
     const tally = new Map<
       string,
@@ -276,8 +276,8 @@ export class CubeScene {
       if (!face) continue;
       const key = `${face.axis}${face.sign}`;
       const cur = tally.get(key);
-      if (cur) cur.n += 1;
-      else tally.set(key, { ...face, n: 1 });
+      if (cur) cur.n += p.w;
+      else tally.set(key, { ...face, n: p.w });
     }
     let best: { axis: "x" | "y" | "z"; sign: number; n: number } | null = null;
     for (const v of tally.values()) if (!best || v.n > best.n) best = v;
@@ -290,11 +290,15 @@ export class CubeScene {
     indexX: number,
     indexY: number,
   ) {
-    const pts: { x: number; y: number }[] = [];
+    const pts: { x: number; y: number; w: number }[] = [];
     for (let t = 0.15; t <= 0.851; t += 0.1) {
+      // triangular weighting: samples near the middle of the two fingers
+      // count more, so an edge-straddling fingertip doesn't hijack the vote.
+      const w = Math.max(0.15, 1 - Math.abs(t - 0.5) * 1.6);
       pts.push({
         x: thumbX + (indexX - thumbX) * t,
         y: thumbY + (indexY - thumbY) * t,
+        w,
       });
     }
     return pts;
