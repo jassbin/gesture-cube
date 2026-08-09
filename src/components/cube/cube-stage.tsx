@@ -37,7 +37,8 @@ export function CubeStage() {
   const scramblingRef = useRef(false);
 
   const [mode, setMode] = useState<Mode>("touch");
-  const [showIntro, setShowIntro] = useState(false);
+  // Show the how-to / permissions card automatically on first load.
+  const [showIntro, setShowIntro] = useState(true);
   const [frame, setFrame] = useState<HandFrame | null>(null);
   const [displayTime, setDisplayTime] = useState("0.00");
   const [gestureFlash, setGestureFlash] = useState<
