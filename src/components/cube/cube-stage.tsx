@@ -417,7 +417,7 @@ export function CubeStage() {
               el="btn-camera"
               icon={<Camera className="h-4 w-4" />}
               label={t("play.enableCamera")}
-              onClick={enableCamera}
+              onClick={() => setShowIntro(true)}
             />
           )}
         </div>
