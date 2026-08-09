@@ -74,6 +74,25 @@
       "1": "Middle",
       "2": "Inner"
     },
+    "intro": {
+      "kicker": "Air Cube · How to play",
+      "title": "A few steps before you start",
+      "hold": {
+        "title": "Put your hand behind the phone",
+        "body": "Point the phone at the space the cube lives in and gesture in front of the lens. Only your two fingertips show on screen — never the camera feed."
+      },
+      "pinch": {
+        "title": "Pinch with thumb + index",
+        "body": "Pinch to grab a face, hold still a moment to lock it, then turn your two fingers to twist it."
+      },
+      "depth": {
+        "title": "Move nearer/farther to pick a layer",
+        "body": "After pinching, hand forward = outer, pull back = middle, pull back more = the innermost blocks. Hold still to lock that layer."
+      },
+      "perms": "Needs two permissions: camera (to read gestures) + motion/gyro (for the 3D view). Allow both in the system prompts after you tap Start.",
+      "start": "Enable camera & start",
+      "cancel": "Not now — keep touch play"
+    },
     "solvedTitle": "Solved!",
     "solvedTime": "Time",
     "solvedMoves": "Moves",
