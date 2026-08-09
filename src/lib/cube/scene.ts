@@ -117,6 +117,7 @@ export class CubeScene {
           const cubie: Cubie = { mesh: g, x, y, z };
           body.userData.cubie = cubie;
           this.cubies.push(cubie);
+          this.pickables.push(body);
         }
       }
     }
