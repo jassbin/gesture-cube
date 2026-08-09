@@ -55,7 +55,11 @@
       "mode": "模式",
       "gesture": "手势",
       "touch": "触屏",
-      "coord": "坐标"
+      "coord": "坐标",
+      "handReadyBanner": "手势已锁定 · 挥掌旋转",
+      "handNoneBanner": "未检测到手 · 抬手到镜头前",
+      "flashRotate": "↻ 旋转中",
+      "flashTwist": "⤾ 拧动"
     },
     "controls": {
       "scramble": "打乱",
