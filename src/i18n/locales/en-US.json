@@ -34,36 +34,56 @@
       "backHome": "Back to home"
     }
   },
-  "starter": {
-    "badge": "Eazo App Starter",
-    "title": "Build your next app with Eazo",
-    "subtitle": "You now have a clean foundation with auth, data access, and platform integrations ready for your product.",
-    "steps": {
-      "readDocs": {
-        "title": "Read the docs",
-        "desc": "Open AGENTS.md and README.md to understand the template architecture.",
-        "code": "AGENTS.md + README.md"
-      },
-      "replacePage": {
-        "title": "Replace this page",
-        "desc": "Move your product UI into src/components and keep page.tsx thin.",
-        "code": "src/app/page.tsx"
-      },
-      "firstFeature": {
-        "title": "Build your first feature",
-        "desc": "Add API routes under src/app/api and call them from typed helpers.",
-        "code": "src/app/api/*"
-      },
-      "translations": {
-        "title": "Add translations",
-        "desc": "Edit en-US / zh-CN strings in src/i18n/locales. LanguageSwitcher and I18nProvider in layout.tsx are already wired.",
-        "code": "src/i18n/locales/"
-      }
+  "nav": {
+    "play": "Air Cube",
+    "records": "Records"
+  },
+  "play": {
+    "enableGyro": "Enable motion parallax",
+    "enableCamera": "Enable camera gestures",
+    "gyroHint": "Tap to allow motion — tilt your phone for real parallax",
+    "cameraHint": "Hold your hand up to the rear camera, wave to rotate",
+    "cameraDenied": "No camera access — switched to touch control",
+    "hud": {
+      "time": "TIME",
+      "moves": "MOVES",
+      "hand": "HAND",
+      "tracking": "TRACK",
+      "fps": "FPS",
+      "handReady": "LOCKED",
+      "handNone": "NO HAND",
+      "mode": "MODE",
+      "gesture": "GESTURE",
+      "touch": "TOUCH",
+      "coord": "COORD"
     },
-    "nextCommand": {
-      "title": "Next command",
-      "desc": "Start developing and iterate in real time.",
-      "command": "bun dev"
-    }
+    "controls": {
+      "scramble": "Scramble",
+      "reset": "Reset",
+      "mode": "Switch mode"
+    },
+    "experimentalSwipe": "Experimental gesture — if a twist misses, swipe on a cube face instead",
+    "solvedTitle": "Solved!",
+    "solvedTime": "Time",
+    "solvedMoves": "Moves",
+    "playAgain": "Play again",
+    "viewRecords": "View records",
+    "saving": "Saving…",
+    "signInToSave": "Sign in to save your result",
+    "twistHint": "Drag on any cube face to twist that layer"
+  },
+  "records": {
+    "title": "Solve records",
+    "subtitle": "Your times and move counts",
+    "best": "Best",
+    "empty": "No records yet — go solve your first cube",
+    "goPlay": "Start playing",
+    "time": "Time",
+    "moves": "Moves",
+    "mode": "Mode",
+    "gesture": "Gesture",
+    "touch": "Touch",
+    "signInPrompt": "Sign in to save and view your records",
+    "share": "Share result"
   }
 }
