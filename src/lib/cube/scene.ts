@@ -612,6 +612,57 @@ export class CubeScene {
     return this.animating;
   }
 
+  // ---- live (1:1 finger-driven) face turn ----
+  // Begin turning the given outer face. The layer's cubies are attached to a
+  // pivot so we can spin them continuously with the fingers.
+  liveTurnStart(axis: "x" | "y" | "z", sign: number) {
+    if (this.animating || this.livePivot) return;
+    this.liveAxis = axis;
+    this.liveSign = sign;
+    this.liveLayer = this.cubies.filter((c) => {
+      const v = axis === "x" ? c.x : axis === "y" ? c.y : c.z;
+      return v === sign;
+    });
+    const pivot = new THREE.Group();
+    this.root.add(pivot);
+    this.liveLayer.forEach((c) => pivot.attach(c.mesh));
+    this.livePivot = pivot;
+    this.animating = true; // block discrete turns while live-turning
+  }
+
+  // Spin the live layer to `angle` radians about its axis (absolute, 1:1).
+  liveTurnUpdate(angle: number) {
+    const pivot = this.livePivot;
+    if (!pivot) return;
+    pivot.rotation.set(0, 0, 0);
+    if (this.liveAxis === "x") pivot.rotation.x = angle;
+    else if (this.liveAxis === "y") pivot.rotation.y = angle;
+    else pivot.rotation.z = angle;
+  }
+
+  // Snap to the nearest quarter turn, bake back into cubies, update logical
+  // coords, and return the number of signed quarter turns applied (about the
+  // +axis). Caller mirrors these into the logical cube state.
+  liveTurnEnd(angle: number): { axis: "x" | "y" | "z"; sign: number; quarters: number } | null {
+    const pivot = this.livePivot;
+    if (!pivot) return null;
+    const quarters = Math.round(angle / (Math.PI / 2));
+    const snapped = quarters * (Math.PI / 2);
+    this.liveTurnUpdate(snapped);
+    const layer = this.liveLayer;
+    layer.forEach((c) => this.root.attach(c.mesh));
+    this.root.remove(pivot);
+    // apply |quarters| logical 90° steps in the right direction
+    const dir = quarters >= 0 ? 1 : -1;
+    for (let i = 0; i < Math.abs(quarters); i++) {
+      this.updateLogicalPositions(layer, this.liveAxis, dir);
+    }
+    this.livePivot = null;
+    this.liveLayer = [];
+    this.animating = false;
+    return { axis: this.liveAxis, sign: this.liveSign, quarters };
+  }
+
   // Animate a face turn, resolves after visual completes. Caller applies logic.
   turn(move: Move, onDone: () => void, duration = 260) {
     if (this.animating) return;
