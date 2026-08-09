@@ -20,10 +20,19 @@ export type HandFrame = {
 
 export type SwipeDir = "left" | "right" | "up" | "down";
 
+// A real "grab a face and drag" gesture, reported in mirrored screen space
+// (what the user sees): start point in 0..1 plus a normalized drag delta.
+export type FingerTwist = {
+  startX: number;
+  startY: number;
+  dx: number;
+  dy: number;
+};
+
 type Callbacks = {
   onFrame?: (f: HandFrame) => void;
   onSpin?: (dx: number, dy: number) => void;
-  onSwipe?: (dir: SwipeDir) => void;
+  onFingerTwist?: (twist: FingerTwist) => void;
 };
 
 const WASM_BASE =
@@ -43,7 +52,16 @@ export function useHandTracking(cbs: Callbacks) {
   const streamRef = useRef<MediaStream | null>(null);
   const rafRef = useRef(0);
   const prevPalm = useRef<{ x: number; y: number; t: number } | null>(null);
-  const lastSwipe = useRef(0);
+  // fingertip drag state machine (mirrored screen coords)
+  const dragRef = useRef<{
+    active: boolean;
+    startX: number;
+    startY: number;
+    lastX: number;
+    lastY: number;
+    lastMoveT: number;
+  } | null>(null);
+  const lastTwist = useRef(0);
   const runningRef = useRef(false);
   const frameTimes = useRef<number[]>([]);
 
