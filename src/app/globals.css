@@ -151,3 +151,37 @@ body {
     @apply font-sans;
   }
 }
+
+/* ---- FUI 广播层 material system ---- */
+.fui-dot-grid {
+  background-image: radial-gradient(rgba(255, 255, 255, 0.16) 1px, transparent 1.4px);
+  background-size: 22px 22px;
+}
+.fui-broadcast-field {
+  background:
+    radial-gradient(120% 90% at 50% 20%, rgba(77, 123, 255, 0.55), transparent 60%),
+    radial-gradient(120% 100% at 15% 100%, rgba(0, 255, 136, 0.14), transparent 55%),
+    linear-gradient(180deg, #1a3fd4 0%, #0d1a52 100%);
+}
+.fui-chip {
+  background: rgba(245, 248, 255, 0.10);
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.18);
+}
+.fui-mono {
+  font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+  letter-spacing: 0.06em;
+}
+.fui-glow-orange {
+  box-shadow: 0 0 0 1px rgba(255, 140, 0, 0.5), 0 6px 26px rgba(255, 140, 0, 0.35);
+}
+.fui-scan::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(180deg, transparent, transparent 96%, rgba(255, 255, 255, 0.05));
+  background-size: 100% 4px;
+}
