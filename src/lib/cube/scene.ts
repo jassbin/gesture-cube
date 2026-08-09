@@ -217,6 +217,10 @@ export class CubeScene {
     dyN: number,
   ): Move | null {
     if (Math.hypot(dxN, dyN) < 0.02) return null;
+    // Grabbing a face turns THAT face's layer (like grabbing a real cube
+    // face and spinning it). The drag direction only chooses cw vs ccw:
+    // we project the drag onto the screen-tangent that runs "around" the
+    // face and use its sign.
     const nWorld = new THREE.Vector3(
       axis === "x" ? sign : 0,
       axis === "y" ? sign : 0,
@@ -229,15 +233,18 @@ export class CubeScene {
       .multiplyScalar(dxN)
       .add(up.multiplyScalar(-dyN))
       .normalize();
+    // rotation about the face normal: sign from (nWorld × drag)·nWorld is 0,
+    // so instead take the component of (nWorld × drag) along nWorld's axis via
+    // the standard twist: rot = nWorld × drag, then read its projection.
     const rot = new THREE.Vector3().crossVectors(nWorld, drag);
-    const axisInfo = this.snapAxis(rot);
-    if (!axisInfo) return null;
-    const { axis: rAxis, sign: rotSign } = axisInfo;
-    // layer along the rotation axis: the grabbed outer face sits at +/-1 on
-    // the face axis; along the rotation axis the touched layer is that face's
-    // sign when they coincide, else the outer layer nearest the drag.
-    const layer = rAxis === axis ? sign : sign;
-    return this.axisLayerToMove(rAxis, layer, rotSign);
+    // dominant component should be along the face axis for a face spin
+    const rotSign =
+      axis === "x"
+        ? Math.sign(rot.x) || 1
+        : axis === "y"
+          ? Math.sign(rot.y) || 1
+          : Math.sign(rot.z) || 1;
+    return this.axisLayerToMove(axis, sign, rotSign);
   }
 
   // Highlight the whole outer face the pinch is grabbing. We sample several
