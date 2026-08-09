@@ -47,6 +47,12 @@ export function CubeStage() {
     if (flashTimer.current) clearTimeout(flashTimer.current);
     flashTimer.current = setTimeout(() => setGestureFlash(null), 700);
   }, []);
+  useEffect(
+    () => () => {
+      if (flashTimer.current) clearTimeout(flashTimer.current);
+    },
+    [],
+  );
   const game = useCubeGame();
   const gameRef = useRef(game);
   useEffect(() => {
