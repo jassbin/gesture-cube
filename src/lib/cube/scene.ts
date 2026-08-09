@@ -496,6 +496,12 @@ export class CubeScene {
     return (hits[0].object as THREE.Mesh) ?? null;
   }
 
+  // True if a screen point (0..1) lands on the cube — used to require the
+  // fingertips to actually touch the cube before a whole-cube spin.
+  hitsCube(nx: number, ny: number): boolean {
+    return this.bodyAt(nx, ny) !== null;
+  }
+
   // From the LOCKED face's own cubies (this.hlBodies), pick the one whose
   // center projects closest to the given screen point. Guarantees the pinned
   // dot is always a cube that belongs to the selected face — never outside it.
