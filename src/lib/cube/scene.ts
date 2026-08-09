@@ -47,6 +47,8 @@ export class CubeScene {
   private camera: THREE.PerspectiveCamera;
   private root: THREE.Group; // overall orientation
   private cubies: Cubie[] = [];
+  private pickables: THREE.Mesh[] = [];
+  private raycaster = new THREE.Raycaster();
   private raf = 0;
   private parallax = { x: 0, y: 0 };
   private targetParallax = { x: 0, y: 0 };
@@ -112,7 +114,9 @@ export class CubeScene {
 
           g.position.set(x * (s + gap), y * (s + gap), z * (s + gap));
           this.root.add(g);
-          this.cubies.push({ mesh: g, x, y, z });
+          const cubie: Cubie = { mesh: g, x, y, z };
+          body.userData.cubie = cubie;
+          this.cubies.push(cubie);
         }
       }
     }
