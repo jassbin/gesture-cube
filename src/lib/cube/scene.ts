@@ -343,12 +343,14 @@ export class CubeScene {
         m.emissive.setHex(0xff8c00);
         m.emissiveIntensity = 0.95;
       }
-      // Pin the two touched cubes the FIRST frame we're locked; afterwards keep
-      // highlighting those SAME meshes (they ride the face as it turns) instead
-      // of re-picking under the moving fingertips.
+      // Pin the two touched cubes the FIRST frame we're locked. They are chosen
+      // from the LOCKED FACE's own 9 cubies (nearest to each fingertip on
+      // screen), so the two dots can never land on a cube outside the selected
+      // face. Afterwards we keep highlighting those SAME meshes as the face
+      // turns, instead of re-picking under the moving fingertips.
       if (!this.lockedTips) {
-        const a = this.bodyAt(thumbX, thumbY);
-        const b = this.bodyAt(indexX, indexY);
+        const a = this.nearestFaceBody(thumbX, thumbY);
+        const b = this.nearestFaceBody(indexX, indexY);
         this.lockedTips = [a, b].filter((m): m is THREE.Mesh => !!m);
       }
       this.highlightTips(this.lockedTips);
