@@ -18,6 +18,9 @@ export type HandFrame = {
   pinching: boolean;
   // true once a pinch has held still long enough to lock the whole face
   locked: boolean;
+  // hand size relative to the size at pinch start (>1 = closer/bigger,
+  // <1 = farther/smaller). Drives "far=small=inner layer" depth selection.
+  depth: number;
   // pinch midpoint in mirrored screen space (0..1), valid while pinching
   pinchX: number;
   pinchY: number;
@@ -76,6 +79,8 @@ export function useHandTracking(cbs: Callbacks) {
   const stillSince = useRef(0);
   const prevMid = useRef<{ x: number; y: number } | null>(null);
   const lockTwistStart = useRef<{ x: number; y: number } | null>(null);
+  // hand size captured when a pinch begins → baseline for depth ("far=small")
+  const pinchBaseSpan = useRef(0);
 
   const stop = useCallback(() => {
     runningRef.current = false;
