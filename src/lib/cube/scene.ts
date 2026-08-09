@@ -102,12 +102,22 @@ export class CubeScene {
               color: PLASTIC,
               roughness: 0.6,
               metalness: 0.2,
-              transparent: true,
-              opacity: 0.42,
-              depthWrite: false,
             }),
           );
           g.add(body);
+          // wireframe skeleton edges on every cubie so the full 3×3×3 lattice
+          // (including cubes hidden behind) reads clearly as a structure.
+          const edges = new THREE.LineSegments(
+            new THREE.EdgesGeometry(new THREE.BoxGeometry(s, s, s)),
+            new THREE.LineBasicMaterial({
+              color: 0x35e0ff,
+              transparent: true,
+              opacity: 0.85,
+              depthTest: false,
+            }),
+          );
+          edges.renderOrder = 2;
+          g.add(edges);
           const off = s / 2 + 0.001;
           // attach stickers on exposed faces
           if (x === 1) this.addSticker(g, FACE_COLORS.R, sticker, "x", off);
