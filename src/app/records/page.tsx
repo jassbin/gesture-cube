@@ -27,7 +27,6 @@ export default function RecordsPage() {
 
   useEffect(() => {
     if (user) load();
-    else setRecords([]);
   }, [user, load]);
 
   const sorted = useMemo(
