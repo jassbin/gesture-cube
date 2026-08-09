@@ -487,7 +487,7 @@ function ControlButton({
       data-el={el}
       onClick={onClick}
       className={cn(
-        "fui-chip flex w-full items-center justify-center gap-1.5 rounded-full px-3 py-2.5 text-xs font-semibold transition-transform active:scale-95",
+        "fui-chip flex w-full items-center justify-center gap-1.5 rounded-full px-3 py-3 text-xs font-semibold transition-transform active:scale-95",
         primary
           ? "bg-primary text-primary-foreground fui-glow-orange"
           : "text-white",
