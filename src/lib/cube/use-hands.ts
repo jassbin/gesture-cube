@@ -202,29 +202,33 @@ export function useHandTracking(cbs: Callbacks) {
         });
 
         if (locked) {
-          // face is locked: track drag from the lock start; commit a turn once
-          // the drag is long enough, then re-arm from the new position.
+          // Face locked: rotate it 1:1 with the fingers. Capture the finger
+          // angle at the moment we lock, then every frame report the signed
+          // angle delta so the face tracks the fingers exactly.
           prevPalm.current = null;
-          const s = lockTwistStart.current;
-          if (s) {
-            const dx = mx - s.x;
-            const dy = my - s.y;
-            if (Math.hypot(dx, dy) > 0.06 && now - lastTwist.current > 500) {
-              lastTwist.current = now;
-              cbRef.current.onFingerTwist?.({
-                startX: s.x,
-                startY: s.y,
-                dx,
-                dy,
-              });
-              lockTwistStart.current = { x: mx, y: my }; // re-arm
-            }
+          const ang = Math.atan2(indexY - thumbY, indexX - thumbX);
+          if (!liveTurnOn.current) {
+            liveTurnOn.current = true;
+            lockBaseAngle.current = ang;
           }
+          // shortest signed difference, unwrapped to (−π, π]
+          let delta = ang - lockBaseAngle.current;
+          while (delta > Math.PI) delta -= 2 * Math.PI;
+          while (delta < -Math.PI) delta += 2 * Math.PI;
+          cbRef.current.onFingerRotate?.(delta);
         } else if (pinching) {
           // FREE + pinching: just previewing the two touched cubes, no turn yet
+          if (liveTurnOn.current) {
+            liveTurnOn.current = false;
+            cbRef.current.onFingerRotateEnd?.();
+          }
           prevPalm.current = null;
         } else {
           // open hand → whole-cube spin from palm motion
+          if (liveTurnOn.current) {
+            liveTurnOn.current = false;
+            cbRef.current.onFingerRotateEnd?.();
+          }
           const prev = prevPalm.current;
           if (prev) {
             const sdx = cx - prev.x;
@@ -235,6 +239,10 @@ export function useHandTracking(cbs: Callbacks) {
         }
       } else {
         prevPalm.current = null;
+        if (liveTurnOn.current) {
+          liveTurnOn.current = false;
+          cbRef.current.onFingerRotateEnd?.();
+        }
         pinchState.current = false;
         lockState.current = "free";
         stillSince.current = 0;
