@@ -226,16 +226,3 @@ export function useHandTracking(cbs: Callbacks) {
 
   return { status, start, stop };
 }
-
-export function swipeToMove(dir: SwipeDir): { face: Face; cw: boolean } {
-  switch (dir) {
-    case "right":
-      return { face: "U", cw: true };
-    case "left":
-      return { face: "U", cw: false };
-    case "up":
-      return { face: "R", cw: true };
-    case "down":
-      return { face: "R", cw: false };
-  }
-}

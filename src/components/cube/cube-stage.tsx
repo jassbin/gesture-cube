@@ -9,9 +9,7 @@ import { CubeScene } from "@/lib/cube/scene";
 import { useGyroParallax } from "@/lib/cube/use-gyro";
 import {
   useHandTracking,
-  swipeToMove,
   type HandFrame,
-  type SwipeDir,
 } from "@/lib/cube/use-hands";
 import { useCubeGame } from "@/lib/cube/use-cube-game";
 import { formatTime } from "@/lib/cube/format";
@@ -234,11 +232,18 @@ export function CubeStage() {
     if (!s || scramblingRef.current) return;
     const dx = e.clientX - s.x;
     const dy = e.clientY - s.y;
-    if (Math.hypot(dx, dy) < 30) return; // treat as tap, not twist
-    let dir: SwipeDir;
-    if (Math.abs(dx) > Math.abs(dy)) dir = dx > 0 ? "right" : "left";
-    else dir = dy > 0 ? "down" : "up";
-    runTurn(swipeToMove(dir));
+    if (Math.hypot(dx, dy) < 24) return; // treat as tap, not twist
+    const scene = sceneRef.current;
+    if (!scene) return;
+    const rect = (e.currentTarget as HTMLElement).getBoundingClientRect();
+    // real face-twist solve from the drag start point + delta (normalized)
+    const move = scene.solveTwistFromDrag(
+      (s.x - rect.left) / rect.width,
+      (s.y - rect.top) / rect.height,
+      dx / rect.width,
+      dy / rect.height,
+    );
+    if (move) runTurn(move);
   };
 
   const cameraActive = hands.status === "active";
