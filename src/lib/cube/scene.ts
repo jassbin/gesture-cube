@@ -314,27 +314,47 @@ export class CubeScene {
     }
     const { axis, sign } = face;
     const key = `${axis}${sign}`;
-    if (key === this.hlKey) return true; // already highlighting this face
 
-    this.clearFaceHighlight();
-    // select every cubie sitting on this outer layer
-    const layerCubies = this.cubies.filter((c) => {
-      const v = axis === "x" ? c.x : axis === "y" ? c.y : c.z;
-      return v === sign;
-    });
-    for (const c of layerCubies) {
-      // the body mesh is the first Mesh child carrying userData.cubie
-      const body = c.mesh.children.find(
-        (o) => (o as THREE.Mesh).isMesh && o.userData.cubie,
-      ) as THREE.Mesh | undefined;
+    // (1) whole-face soft highlight — rebuild only when the grabbed face changes
+    if (key !== this.hlKey) {
+      this.clearFaceBodies();
+      const layerCubies = this.cubies.filter((c) => {
+        const v = axis === "x" ? c.x : axis === "y" ? c.y : c.z;
+        return v === sign;
+      });
+      for (const c of layerCubies) {
+        const body = c.mesh.children.find(
+          (o) => (o as THREE.Mesh).isMesh && o.userData.cubie,
+        ) as THREE.Mesh | undefined;
+        if (!body) continue;
+        const m = body.material as THREE.MeshStandardMaterial;
+        m.emissive.setHex(0xffb020);
+        m.emissiveIntensity = 0.45;
+        this.hlBodies.push(body);
+      }
+      this.hlKey = key;
+    }
+
+    // (2) the two exact cubes each finger is touching — bright, updates each frame
+    this.clearTipBodies();
+    const tThumb = this.bodyAt(thumbX, thumbY);
+    const tIndex = this.bodyAt(indexX, indexY);
+    for (const body of [tThumb, tIndex]) {
       if (!body) continue;
       const m = body.material as THREE.MeshStandardMaterial;
-      m.emissive.setHex(0xffb020);
-      m.emissiveIntensity = 0.7;
-      this.hlBodies.push(body);
+      m.emissive.setHex(0xffd54a);
+      m.emissiveIntensity = 1.25;
+      this.hlTipBodies.push(body);
     }
-    this.hlKey = key;
     return true;
+  }
+
+  // the front-most cube body under a single screen point (0..1, mirrored)
+  private bodyAt(nx: number, ny: number): THREE.Mesh | null {
+    const ndc = new THREE.Vector2(nx * 2 - 1, -(ny * 2 - 1));
+    this.raycaster.setFromCamera(ndc, this.camera);
+    const hit = this.raycaster.intersectObjects(this.pickables, false)[0];
+    return (hit?.object as THREE.Mesh) ?? null;
   }
 
   grabbedFace(): { axis: "x" | "y" | "z"; sign: number } | null {
