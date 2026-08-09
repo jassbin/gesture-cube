@@ -3,9 +3,9 @@
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { useTranslation } from "react-i18next";
-import { PartyPopper, Trophy } from "lucide-react";
+import { PartyPopper, Trophy, Share2 } from "lucide-react";
 import { useEazo } from "@eazo/sdk/react";
-import { auth } from "@eazo/sdk";
+import { auth, share } from "@eazo/sdk";
 import { formatTime } from "@/lib/cube/format";
 import { createRecord } from "@/lib/api/records";
 import type { SolveResult } from "@/lib/cube/use-cube-game";
@@ -25,7 +25,31 @@ export function SolvedSheet({
   const { t } = useTranslation();
   const user = useEazo((s) => s.auth.user);
   const [saving, setSaving] = useState(false);
+  const [shareFailed, setShareFailed] = useState(false);
   const savedFor = useRef<SolveResult | null>(null);
+
+  const handleShare = async () => {
+    if (!result) return;
+    setShareFailed(false);
+    const text = [
+      "Community share",
+      "Scenario: cube_solve",
+      "App: 隔空魔方 / Air Cube",
+      `Result: solved a 3x3 cube in ${formatTime(result.timeMs, locale)}`,
+      `Detail: ${result.moves} moves`,
+      `Detail: mode ${mode}`,
+      "Community angle: Think you can beat this time? Solve one hands-free.",
+    ].join("\n");
+    try {
+      await share.compose({
+        text,
+        sourceAppId: process.env.NEXT_PUBLIC_EAZO_APP_ID || undefined,
+        targetPath: "/",
+      });
+    } catch {
+      setShareFailed(true);
+    }
+  };
 
   useEffect(() => {
     if (!result || !user || savedFor.current === result) return;
@@ -64,7 +88,21 @@ export function SolvedSheet({
           <p className="mt-4 fui-mono text-xs text-accent">{t("play.saving")}</p>
         )}
 
-        <div className="mt-5 flex gap-2">
+        <button
+          data-el="btn-share-result"
+          onClick={handleShare}
+          className="mt-4 flex w-full items-center justify-center gap-1.5 rounded-full border border-secondary/50 bg-secondary/10 px-4 py-2.5 text-sm font-semibold text-secondary active:scale-95"
+        >
+          <Share2 className="h-4 w-4" />
+          {t("share.openComposer")}
+        </button>
+        {shareFailed && (
+          <p role="status" className="mt-2 text-center text-xs text-white/60">
+            {t("share.retry")}
+          </p>
+        )}
+
+        <div className="mt-4 flex gap-2">
           <button
             data-el="btn-play-again"
             onClick={onPlayAgain}
