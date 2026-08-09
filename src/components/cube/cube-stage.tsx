@@ -303,7 +303,6 @@ export function CubeStage() {
         muted
         aria-hidden
         className="pointer-events-none absolute h-px w-px opacity-0"
-        style={{ transform: "scaleX(-1)" }}
       />
       {/* dot grid overlay */}
       <div className="fui-dot-grid pointer-events-none absolute inset-0 opacity-60" />

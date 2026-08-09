@@ -23,7 +23,6 @@ export function HandSkeleton({ frame }: { frame: HandFrame | null }) {
 
     const W = rect.width;
     const H = rect.height;
-    // mirror x so the points feel natural on-screen
     // rear camera → no mirror
     const px = (p: { x: number }) => p.x * W;
     const py = (p: { y: number }) => p.y * H;
