@@ -182,8 +182,10 @@ export function useHandTracking(cbs: Callbacks) {
             stillSince.current = 0;
           }
         } else {
-          // LOCKED — unlock when hand shrinks clearly (moved far from camera)
-          if (handSpan < lockSpan.current * 0.7) {
+          // LOCKED — unlock only when the hand shrinks a LOT (clearly pulled
+          // far from camera). Kept loose so selecting the inner layer (a modest
+          // pull-back) never accidentally breaks the lock.
+          if (handSpan < lockSpan.current * 0.6) {
             lockState.current = "free";
             stillSince.current = 0;
             lockTwistStart.current = null;
