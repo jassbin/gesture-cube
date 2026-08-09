@@ -1,7 +1,7 @@
 "use client";
 
 import { useTranslation } from "react-i18next";
-import { Smartphone, Hand, Camera, Compass, MoveVertical } from "lucide-react";
+import { Smartphone, Hand, Camera, Compass, RotateCw } from "lucide-react";
 
 /**
  * One-time onboarding card shown BEFORE the gesture camera starts.
@@ -23,7 +23,7 @@ export function GestureIntro({
   const steps = [
     { icon: Smartphone, key: "hold" },
     { icon: Hand, key: "pinch" },
-    { icon: MoveVertical, key: "depth" },
+    { icon: RotateCw, key: "turn" },
   ] as const;
 
   return (
