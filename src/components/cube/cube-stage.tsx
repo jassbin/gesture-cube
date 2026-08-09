@@ -281,9 +281,9 @@ export function CubeStage() {
         </button>
       )}
 
-      {/* experimental gesture hint */}
+      {/* experimental gesture hint — kept near the bottom, clear of banner/flash */}
       {mode === "gesture" && cameraActive && (
-        <div className="pointer-events-none absolute inset-x-0 top-[34%] z-20 px-8 text-center">
+        <div className="pointer-events-none absolute inset-x-0 bottom-[150px] z-20 px-8 text-center">
           <p className="fui-mono text-[10px] uppercase tracking-wider text-secondary/90">
             {t("play.experimentalSwipe")}
           </p>
