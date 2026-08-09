@@ -355,6 +355,9 @@ export class CubeScene {
       this.highlightTips(this.lockedTips);
       return true;
     }
+    // FREE (not frozen): the face isn't locked, so drop any pinned tips and
+    // re-pick the touched cubes normally.
+    this.lockedTips = null;
     const voted = this.voteFace(
       this.pinchSamples(thumbX, thumbY, indexX, indexY),
     );
@@ -482,6 +485,7 @@ export class CubeScene {
   }
 
   clearFaceHighlight() {
+    this.lockedTips = null;
     this.clearTipBodies();
     this.clearFaceBodies();
   }
