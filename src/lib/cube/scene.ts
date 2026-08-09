@@ -286,16 +286,22 @@ export class CubeScene {
       string,
       { axis: "x" | "y" | "z"; sign: number; n: number }
     >();
+    const camPos = new THREE.Vector3();
+    this.camera.getWorldPosition(camPos);
     for (const p of samples) {
       const ndc = new THREE.Vector2(p.x * 2 - 1, -(p.y * 2 - 1));
       this.raycaster.setFromCamera(ndc, this.camera);
       const hit = this.raycaster.intersectObjects(this.pickables, false)[0];
-      if (!hit || !hit.face) continue;
-      const nWorld = hit.face.normal
-        .clone()
-        .transformDirection(hit.object.matrixWorld)
-        .normalize();
-      const face = this.snapAxis(nWorld);
+      if (!hit) continue;
+      const cubie = hit.object.userData.cubie as
+        | { x: number; y: number; z: number; mesh: THREE.Object3D }
+        | undefined;
+      if (!cubie) continue;
+      // Instead of trusting the hit triangle's normal (which can point sideways
+      // or backward near an edge and pick a wrong/rear face), decide from the
+      // hit cubie itself: of ITS outer faces, choose the one most facing the
+      // camera. A fingertip on the front therefore always selects a front face.
+      const face = this.frontFaceOfCubie(cubie, camPos);
       if (!face) continue;
       const key = `${face.axis}${face.sign}`;
       const cur = tally.get(key);
