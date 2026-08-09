@@ -71,6 +71,9 @@ export function useHandTracking(cbs: Callbacks) {
   const frameTimes = useRef<number[]>([]);
   // hysteresis + smoothing state
   const pinchState = useRef(false);
+  // consecutive frames of a firm (intentional) pinch before we commit to it,
+  // so a light touch / quick brush of the two fingers does NOT grab a face.
+  const pinchIntent = useRef(0);
   const smThumb = useRef<{ x: number; y: number } | null>(null);
   const smIndex = useRef<{ x: number; y: number } | null>(null);
   // FREE / LOCKED face state machine
