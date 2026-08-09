@@ -140,8 +140,23 @@ export function CubeStage() {
 
   // ---- hand tracking gesture handling ----
   const onSpin = useCallback(
-    (dx: number, dy: number) => {
-      sceneRef.current?.addSpin(dx, dy);
+    (
+      dx: number,
+      dy: number,
+      thumbX: number,
+      thumbY: number,
+      indexX: number,
+      indexY: number,
+    ) => {
+      const scene = sceneRef.current;
+      if (!scene) return;
+      // Require the fingertips to actually be ON the cube: only spin when at
+      // least one of the two points is touching the cube. No touch → no spin,
+      // so the cube never feels "stuck to the hand" from a distance.
+      const touching =
+        scene.hitsCube(thumbX, thumbY) || scene.hitsCube(indexX, indexY);
+      if (!touching) return;
+      scene.addSpin(dx, dy);
       // Flash "rotating" when the hand actually moves the cube (throttled).
       const mag = Math.hypot(dx, dy);
       const now = performance.now();
