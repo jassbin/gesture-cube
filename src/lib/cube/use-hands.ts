@@ -222,7 +222,7 @@ export function useHandTracking(cbs: Callbacks) {
           if (prev) {
             const sdx = cx - prev.x;
             const sdy = cy - prev.y;
-            cbRef.current.onSpin?.(sdx * 3.2, sdy * 3.2);
+            cbRef.current.onSpin?.(sdx * 5.5, sdy * 5.5);
           }
           prevPalm.current = { x: cx, y: cy, t: now };
         }
