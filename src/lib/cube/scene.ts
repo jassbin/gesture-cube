@@ -251,16 +251,16 @@ export class CubeScene {
     // A real cube face turns about ITS OWN normal axis. Grabbing a face and
     // dragging tangentially spins that exact layer (the one we highlighted),
     // never a perpendicular layer. The drag direction only decides the SIGN.
-    const rot = new THREE.Vector3().crossVectors(nWorld, drag);
-    // Project the intended rotation onto the grabbed face's normal axis so the
-    // layer that turns is always the selected face's layer (axis+sign).
-    const comp = axis === "x" ? rot.x : axis === "y" ? rot.y : rot.z;
-    if (Math.abs(comp) < 1e-4) return null;
-    // For a face at +normal, a screen drag maps to a turn about that normal.
-    // rotSign = orientation of the tangential drag around the face normal.
-    const tangentialRot = new THREE.Vector3().crossVectors(nWorld, drag);
-    const rotSign = tangentialRot.dot(nWorld) >= 0 ? 1 : -1;
-    // The layer that turns is the grabbed face's own layer.
+    // Build two tangents on the face plane. rotSign = which way the drag
+    // circulates around the face normal (t2 · drag), so dragging one way turns
+    // the face CW and the other way CCW — always the SAME grabbed layer.
+    let t1 = new THREE.Vector3(0, 1, 0).cross(nWorld);
+    if (t1.lengthSq() < 1e-6) t1 = new THREE.Vector3(1, 0, 0).cross(nWorld);
+    t1.normalize();
+    const t2 = new THREE.Vector3().crossVectors(nWorld, t1).normalize();
+    const along = drag.dot(t2);
+    const rotSign = along >= 0 ? 1 : -1;
+    // The layer that turns is the grabbed face's own layer (axis + sign).
     return this.axisLayerToMove(axis, sign, rotSign);
   }
 
