@@ -116,8 +116,7 @@ export function useHandTracking(cbs: Callbacks) {
         const dist = (a: { x: number; y: number }, b: { x: number; y: number }) =>
           Math.hypot(a.x - b.x, a.y - b.y);
 
-        // --- pinch detection with hysteresis (different enter/exit thresholds
-        // so it doesn't flicker at the boundary) ---
+        // --- pinch detection with hysteresis ---
         const handSpan = dist(pts[0], pts[5]) || 0.15;
         const pinchGap = dist(pts[4], pts[8]);
         const ratio = pinchGap / handSpan;
@@ -125,11 +124,10 @@ export function useHandTracking(cbs: Callbacks) {
         else if (pinchState.current && ratio > 0.75) pinchState.current = false;
         const pinching = pinchState.current;
 
-        // low-pass filter the two touch points so MediaPipe jitter doesn't make
-        // the tip cubes flicker. Snap (no smoothing) on the first pinch frame.
-        const rawThumb = { x: 1 - pts[4].x, y: pts[4].y };
-        const rawIndex = { x: 1 - pts[8].x, y: pts[8].y };
-        const a = 0.45; // smoothing factor (higher = more responsive)
+        // low-pass filter the two touch points (rear camera → no mirror)
+        const rawThumb = { x: pts[4].x, y: pts[4].y };
+        const rawIndex = { x: pts[8].x, y: pts[8].y };
+        const a = 0.45;
         const lp = (
           prev: { x: number; y: number } | null,
           raw: { x: number; y: number },
@@ -143,10 +141,41 @@ export function useHandTracking(cbs: Callbacks) {
         const thumbY = smThumb.current.y;
         const indexX = smIndex.current.x;
         const indexY = smIndex.current.y;
-
-        // pinch midpoint (mirrored screen space) from smoothed points
         const mx = (thumbX + indexX) / 2;
         const my = (thumbY + indexY) / 2;
+
+        // --- FREE / LOCKED state machine ---
+        // FREE: pinch selects the two touched cubes (preview). Hold still a
+        //       moment → lock the whole face. LOCKED: turning the face; move the
+        //       hand far from the camera (hand gets small) → unlock.
+        if (!pinching) {
+          lockState.current = "free";
+          stillSince.current = 0;
+        } else if (lockState.current === "free") {
+          // detect "still" — pinch midpoint barely moving
+          const pm = prevMid.current;
+          const moved = pm ? Math.hypot(mx - pm.x, my - pm.y) : 1;
+          if (moved < 0.012) {
+            if (stillSince.current === 0) stillSince.current = now;
+            else if (now - stillSince.current > 420) {
+              // LOCK: remember the hand size so shrinking it later unlocks
+              lockState.current = "locked";
+              lockSpan.current = handSpan;
+              lockTwistStart.current = { x: mx, y: my };
+            }
+          } else {
+            stillSince.current = 0;
+          }
+        } else {
+          // LOCKED — unlock when hand shrinks clearly (moved far from camera)
+          if (handSpan < lockSpan.current * 0.7) {
+            lockState.current = "free";
+            stillSince.current = 0;
+            lockTwistStart.current = null;
+          }
+        }
+        prevMid.current = { x: mx, y: my };
+        const locked = lockState.current === "locked";
 
         cbRef.current.onFrame?.({
           present: true,
@@ -154,6 +183,7 @@ export function useHandTracking(cbs: Callbacks) {
           y: cy,
           landmarks: pts.map((p) => ({ x: p.x, y: p.y })),
           pinching,
+          locked,
           pinchX: mx,
           pinchY: my,
           thumbX,
@@ -163,41 +193,29 @@ export function useHandTracking(cbs: Callbacks) {
           fps,
         });
 
-        if (pinching) {
-          // grabbing a face: pause whole-cube spin and track the drag
+        if (locked) {
+          // face is locked: track drag from the lock start; commit a turn once
+          // the drag is long enough, then re-arm from the new position.
           prevPalm.current = null;
-          const d = dragRef.current;
-          if (!d || !d.active) {
-            dragRef.current = {
-              active: true,
-              startX: mx,
-              startY: my,
-              lastX: mx,
-              lastY: my,
-              lastMoveT: now,
-            };
-          } else {
-            d.lastX = mx;
-            d.lastY = my;
-          }
-        } else {
-          // released: if we were pinching and dragged far enough, twist once
-          const d = dragRef.current;
-          if (d && d.active) {
-            const dx = d.lastX - d.startX;
-            const dy = d.lastY - d.startY;
-            const total = Math.hypot(dx, dy);
-            if (total > 0.05 && now - lastTwist.current > 400) {
+          const s = lockTwistStart.current;
+          if (s) {
+            const dx = mx - s.x;
+            const dy = my - s.y;
+            if (Math.hypot(dx, dy) > 0.06 && now - lastTwist.current > 500) {
               lastTwist.current = now;
               cbRef.current.onFingerTwist?.({
-                startX: d.startX,
-                startY: d.startY,
+                startX: s.x,
+                startY: s.y,
                 dx,
                 dy,
               });
+              lockTwistStart.current = { x: mx, y: my }; // re-arm
             }
-            dragRef.current = null;
           }
+        } else if (pinching) {
+          // FREE + pinching: just previewing the two touched cubes, no turn yet
+          prevPalm.current = null;
+        } else {
           // open hand → whole-cube spin from palm motion
           const prev = prevPalm.current;
           if (prev) {
@@ -211,6 +229,10 @@ export function useHandTracking(cbs: Callbacks) {
         prevPalm.current = null;
         dragRef.current = null;
         pinchState.current = false;
+        lockState.current = "free";
+        stillSince.current = 0;
+        lockTwistStart.current = null;
+        prevMid.current = null;
         smThumb.current = null;
         smIndex.current = null;
         cbRef.current.onFrame?.({
@@ -219,6 +241,7 @@ export function useHandTracking(cbs: Callbacks) {
           y: 0.5,
           landmarks: [],
           pinching: false,
+          locked: false,
           pinchX: 0.5,
           pinchY: 0.5,
           thumbX: 0.5,
