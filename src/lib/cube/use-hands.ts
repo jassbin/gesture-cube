@@ -63,15 +63,6 @@ export function useHandTracking(cbs: Callbacks) {
   const streamRef = useRef<MediaStream | null>(null);
   const rafRef = useRef(0);
   const prevPalm = useRef<{ x: number; y: number; t: number } | null>(null);
-  // fingertip drag state machine (mirrored screen coords)
-  const dragRef = useRef<{
-    active: boolean;
-    startX: number;
-    startY: number;
-    lastX: number;
-    lastY: number;
-    lastMoveT: number;
-  } | null>(null);
   const lastTwist = useRef(0);
   const runningRef = useRef(false);
   const frameTimes = useRef<number[]>([]);
@@ -235,7 +226,6 @@ export function useHandTracking(cbs: Callbacks) {
         }
       } else {
         prevPalm.current = null;
-        dragRef.current = null;
         pinchState.current = false;
         lockState.current = "free";
         stillSince.current = 0;
