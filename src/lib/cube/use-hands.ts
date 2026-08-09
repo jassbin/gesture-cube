@@ -149,6 +149,17 @@ export function useHandTracking(cbs: Callbacks) {
         }
         const pinching = pinchState.current;
 
+        // "palm-like" = hand open (fingers extended), not pinching → this is
+        // the whole-cube rotation mode. We show a translucent hand for it.
+        const spread =
+          (dist(pts[8], pts[0]) +
+            dist(pts[12], pts[0]) +
+            dist(pts[16], pts[0]) +
+            dist(pts[20], pts[0])) /
+          4 /
+          handSpan;
+        const palm = !pinching && spread > 1.15;
+
         // low-pass filter the two touch points (rear camera → no mirror)
         const rawThumb = { x: pts[4].x, y: pts[4].y };
         const rawIndex = { x: pts[8].x, y: pts[8].y };
