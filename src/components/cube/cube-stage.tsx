@@ -184,26 +184,17 @@ export function CubeStage() {
     const scene = sceneRef.current;
     if (!scene) return;
     if (mode === "gesture" && hands.status === "active" && frame?.pinching) {
-      if (frame.locked) {
-        const hit = scene.pickFaceAt(
-          frame.thumbX,
-          frame.thumbY,
-          frame.indexX,
-          frame.indexY,
-          true, // freeze: keep the locked face, don't re-vote
-        );
-        grabbedFace.current = hit ? scene.grabbedFace() : null;
-      } else {
-        // preview: only the two touched cubes, face not locked yet
-        scene.showTipsOnly(
-          frame.thumbX,
-          frame.thumbY,
-          frame.indexX,
-          frame.indexY,
-          frame.depth,
-        );
-        grabbedFace.current = null;
-      }
+      // Always vote + highlight the whole face under the two fingers, on any
+      // face (left/middle/right). Once locked we freeze it so it can't jump.
+      const hit = scene.pickFaceAt(
+        frame.thumbX,
+        frame.thumbY,
+        frame.indexX,
+        frame.indexY,
+        frame.locked, // freeze only after locking
+        frame.depth,
+      );
+      grabbedFace.current = hit ? scene.grabbedFace() : null;
     } else {
       scene.clearFaceHighlight();
       grabbedFace.current = null;
