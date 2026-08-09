@@ -163,11 +163,15 @@ export function CubeStage() {
     setMode("gesture");
   }, [hands]);
 
+  // React to a camera denial reported by the tracking hook (event-driven,
+  // toast only — mode stays touch because gesture never activated).
+  const notifiedDenied = useRef(false);
   useEffect(() => {
-    if (hands.status === "denied") {
+    if (hands.status === "denied" && !notifiedDenied.current) {
+      notifiedDenied.current = true;
       toast(t("play.cameraDenied"));
-      setMode("touch");
     }
+    if (hands.status !== "denied") notifiedDenied.current = false;
   }, [hands.status, t]);
 
   const toggleMode = useCallback(() => {
