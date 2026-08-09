@@ -310,15 +310,32 @@ export class CubeScene {
     indexX: number,
     indexY: number,
   ): boolean {
-    const face = this.voteFace(
+    const voted = this.voteFace(
       this.pinchSamples(thumbX, thumbY, indexX, indexY),
     );
-    if (!face) {
+    if (!voted) {
       this.clearFaceHighlight();
+      this.faceHist = [];
       return false;
     }
-    const { axis, sign } = face;
-    const key = `${axis}${sign}`;
+    // (0) temporal majority vote over the last few frames so the highlighted
+    // face doesn't flicker between two faces when the fingers sit near an edge.
+    const votedKey = `${voted.axis}${voted.sign}`;
+    this.faceHist.push(votedKey);
+    if (this.faceHist.length > 6) this.faceHist.shift();
+    const counts = new Map<string, number>();
+    for (const k of this.faceHist) counts.set(k, (counts.get(k) ?? 0) + 1);
+    let stableKey = this.hlKey ?? votedKey;
+    let bestN = -1;
+    for (const [k, n] of counts) if (n > bestN) (bestN = n), (stableKey = k);
+    // only switch away from the current face when the new one is clearly ahead
+    if (this.hlKey && stableKey !== this.hlKey) {
+      const curN = counts.get(this.hlKey) ?? 0;
+      if (bestN - curN < 2) stableKey = this.hlKey;
+    }
+    const axis = stableKey[0] as "x" | "y" | "z";
+    const sign = stableKey.slice(1) === "-1" ? -1 : 1;
+    const key = stableKey;
 
     // (1) whole-face soft highlight — rebuild only when the grabbed face changes
     if (key !== this.hlKey) {
