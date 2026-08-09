@@ -119,12 +119,24 @@ export function useHandTracking(cbs: Callbacks) {
         const dist = (a: { x: number; y: number }, b: { x: number; y: number }) =>
           Math.hypot(a.x - b.x, a.y - b.y);
 
-        // --- pinch detection with hysteresis ---
+        // --- pinch detection: needs a FIRM, sustained pinch (intent) ---
+        // A light touch or a quick brush of the two fingers should NOT grab a
+        // face — anything short of a committed pinch counts as "not pinching",
+        // which drives whole-cube rotation and makes spinning easy to trigger.
         const handSpan = dist(pts[0], pts[5]) || 0.15;
         const pinchGap = dist(pts[4], pts[8]);
         const ratio = pinchGap / handSpan;
-        if (!pinchState.current && ratio < 0.5) pinchState.current = true;
-        else if (pinchState.current && ratio > 0.75) pinchState.current = false;
+        const FIRM = 0.32; // fingers must be this close to count as a pinch
+        const RELEASE = 0.6; // and this far apart to release
+        const INTENT_FRAMES = 5; // must stay firm this many frames first
+        if (!pinchState.current) {
+          if (ratio < FIRM) pinchIntent.current += 1;
+          else pinchIntent.current = 0;
+          if (pinchIntent.current >= INTENT_FRAMES) pinchState.current = true;
+        } else if (ratio > RELEASE) {
+          pinchState.current = false;
+          pinchIntent.current = 0;
+        }
         const pinching = pinchState.current;
 
         // low-pass filter the two touch points (rear camera → no mirror)
