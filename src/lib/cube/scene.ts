@@ -428,11 +428,15 @@ export class CubeScene {
     indexY: number,
     depth = 1,
   ) {
-    this.clearTipBodies();
     const tThumb = this.bodyAtDepth(thumbX, thumbY, depth);
     const tIndex = this.bodyAtDepth(indexX, indexY, depth);
-    for (const body of [tThumb, tIndex]) {
-      if (!body) continue;
+    this.highlightTips([tThumb, tIndex].filter((m): m is THREE.Mesh => !!m));
+  }
+
+  // Bright-highlight exactly the given cube meshes as the two "touched" dots.
+  private highlightTips(bodies: THREE.Mesh[]) {
+    this.clearTipBodies();
+    for (const body of bodies) {
       const m = body.material as THREE.MeshStandardMaterial;
       m.emissive.setHex(0xffd54a);
       m.emissiveIntensity = 1.25;
