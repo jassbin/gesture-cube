@@ -34,8 +34,9 @@ export function useGyroParallax(onChange: Handler) {
     if (!base.current) base.current = { beta, gamma };
     const db = beta - base.current.beta;
     const dg = gamma - base.current.gamma;
-    const ny = Math.max(-1, Math.min(1, db / 35));
-    const nx = Math.max(-1, Math.min(1, dg / 35));
+    // Map a smaller tilt range to full parallax → tilting feels more responsive.
+    const ny = Math.max(-1, Math.min(1, db / 22));
+    const nx = Math.max(-1, Math.min(1, dg / 22));
     cb.current(nx, ny);
     setStatus((s) => (s === "active" ? s : "active"));
   }, []);
