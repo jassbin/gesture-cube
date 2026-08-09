@@ -47,6 +47,11 @@ type Callbacks = {
   onFrame?: (f: HandFrame) => void;
   onSpin?: (dx: number, dy: number) => void;
   onFingerTwist?: (twist: FingerTwist) => void;
+  // Live, 1:1 finger rotation of the locked face. `delta` is the signed angle
+  // (radians) the two fingers have rotated since the face was locked.
+  onFingerRotate?: (delta: number) => void;
+  // Fired when the locked face is released (fingers opened) — commit + snap.
+  onFingerRotateEnd?: () => void;
 };
 
 const WASM_BASE =
@@ -67,6 +72,10 @@ export function useHandTracking(cbs: Callbacks) {
   const rafRef = useRef(0);
   const prevPalm = useRef<{ x: number; y: number; t: number } | null>(null);
   const lastTwist = useRef(0);
+  // finger angle (atan2 of index−thumb) captured when the face locks, and
+  // whether a live 1:1 turn is currently in progress.
+  const lockBaseAngle = useRef(0);
+  const liveTurnOn = useRef(false);
   const runningRef = useRef(false);
   const frameTimes = useRef<number[]>([]);
   // hysteresis + smoothing state
