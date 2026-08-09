@@ -216,6 +216,7 @@ export function useHandTracking(cbs: Callbacks) {
           landmarks: pts.map((p) => ({ x: p.x, y: p.y })),
           pinching,
           locked,
+          palm,
           depth: 1,
           pinchX: mx,
           pinchY: my,
