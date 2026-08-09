@@ -197,6 +197,10 @@ export function useHandTracking(cbs: Callbacks) {
           pinching: false,
           pinchX: 0.5,
           pinchY: 0.5,
+          thumbX: 0.5,
+          thumbY: 0.5,
+          indexX: 0.5,
+          indexY: 0.5,
           fps,
         });
       }
