@@ -370,7 +370,18 @@ export class CubeScene {
       this.hlKey = key;
     }
 
-    // (2) the two exact cubes each finger is touching — bright, updates each frame
+    // (2) the two exact cubes each finger is touching — bright, every frame
+    this.refreshTips(thumbX, thumbY, indexX, indexY);
+    return true;
+  }
+
+  // Update the two bright "touched cube" markers under each fingertip.
+  private refreshTips(
+    thumbX: number,
+    thumbY: number,
+    indexX: number,
+    indexY: number,
+  ) {
     this.clearTipBodies();
     const tThumb = this.bodyAt(thumbX, thumbY);
     const tIndex = this.bodyAt(indexX, indexY);
@@ -381,7 +392,13 @@ export class CubeScene {
       m.emissiveIntensity = 1.25;
       this.hlTipBodies.push(body);
     }
-    return true;
+  }
+
+  // FREE-preview: show ONLY the two touched cubes, no whole-face highlight.
+  showTipsOnly(thumbX: number, thumbY: number, indexX: number, indexY: number) {
+    this.clearFaceBodies(); // drop any face glow
+    this.faceHist = [];
+    this.refreshTips(thumbX, thumbY, indexX, indexY);
   }
 
   // the front-most cube body under a single screen point (0..1, mirrored)
