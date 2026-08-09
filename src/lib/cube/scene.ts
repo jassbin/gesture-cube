@@ -337,7 +337,15 @@ export class CubeScene {
     return true;
   }
 
+  grabbedFace(): { axis: "x" | "y" | "z"; sign: number } | null {
+    if (!this.hlKey) return null;
+    const axis = this.hlKey[0] as "x" | "y" | "z";
+    const sign = this.hlKey.slice(1) === "-1" ? -1 : 1;
+    return { axis, sign };
+  }
+
   clearFaceHighlight() {
+    for (const body of this.hlBodies) {
       const m = body.material as THREE.MeshStandardMaterial;
       m.emissive.setHex(0x000000);
       m.emissiveIntensity = 0;
