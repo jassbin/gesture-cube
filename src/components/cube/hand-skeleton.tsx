@@ -66,6 +66,31 @@ export function HandSkeleton({ frame }: { frame: HandFrame | null }) {
       ctx.arc(px(p), py(p), 8, 0, Math.PI * 2);
       ctx.fill();
     });
+
+    // pinch highlight: connect thumb (4) and index (8) tips + glow the grab point
+    if (frame.pinching && frame.landmarks.length >= 21) {
+      const thumb = frame.landmarks[4];
+      const index = frame.landmarks[8];
+      const gx = (px(thumb) + px(index)) / 2;
+      const gy = (py(thumb) + py(index)) / 2;
+      ctx.strokeStyle = "rgba(255,176,32,0.95)";
+      ctx.lineWidth = 12;
+      ctx.shadowColor = "rgba(255,176,32,0.95)";
+      ctx.shadowBlur = 26;
+      ctx.beginPath();
+      ctx.moveTo(px(thumb), py(thumb));
+      ctx.lineTo(px(index), py(index));
+      ctx.stroke();
+      ctx.fillStyle = "rgba(255,176,32,0.9)";
+      ctx.beginPath();
+      ctx.arc(gx, gy, 24, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.shadowBlur = 0;
+      ctx.fillStyle = "#fff";
+      ctx.beginPath();
+      ctx.arc(gx, gy, 9, 0, Math.PI * 2);
+      ctx.fill();
+    }
   }, [frame]);
 
   return (
