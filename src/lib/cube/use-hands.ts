@@ -116,20 +116,37 @@ export function useHandTracking(cbs: Callbacks) {
         const dist = (a: { x: number; y: number }, b: { x: number; y: number }) =>
           Math.hypot(a.x - b.x, a.y - b.y);
 
-        // --- pinch detection: thumb tip (4) close to index tip (8) ---
-        // Scale threshold by hand size (wrist→index-mcp) so it works at any
-        // distance from the camera.
+        // --- pinch detection with hysteresis (different enter/exit thresholds
+        // so it doesn't flicker at the boundary) ---
         const handSpan = dist(pts[0], pts[5]) || 0.15;
         const pinchGap = dist(pts[4], pts[8]);
-        const pinching = pinchGap < handSpan * 0.55;
+        const ratio = pinchGap / handSpan;
+        if (!pinchState.current && ratio < 0.5) pinchState.current = true;
+        else if (pinchState.current && ratio > 0.75) pinchState.current = false;
+        const pinching = pinchState.current;
 
-        // pinch midpoint in mirrored screen space (what the user sees)
-        const mx = 1 - (pts[4].x + pts[8].x) / 2;
-        const my = (pts[4].y + pts[8].y) / 2;
-        const thumbX = 1 - pts[4].x;
-        const thumbY = pts[4].y;
-        const indexX = 1 - pts[8].x;
-        const indexY = pts[8].y;
+        // low-pass filter the two touch points so MediaPipe jitter doesn't make
+        // the tip cubes flicker. Snap (no smoothing) on the first pinch frame.
+        const rawThumb = { x: 1 - pts[4].x, y: pts[4].y };
+        const rawIndex = { x: 1 - pts[8].x, y: pts[8].y };
+        const a = 0.45; // smoothing factor (higher = more responsive)
+        const lp = (
+          prev: { x: number; y: number } | null,
+          raw: { x: number; y: number },
+        ) =>
+          prev
+            ? { x: prev.x + (raw.x - prev.x) * a, y: prev.y + (raw.y - prev.y) * a }
+            : raw;
+        smThumb.current = lp(smThumb.current, rawThumb);
+        smIndex.current = lp(smIndex.current, rawIndex);
+        const thumbX = smThumb.current.x;
+        const thumbY = smThumb.current.y;
+        const indexX = smIndex.current.x;
+        const indexY = smIndex.current.y;
+
+        // pinch midpoint (mirrored screen space) from smoothed points
+        const mx = (thumbX + indexX) / 2;
+        const my = (thumbY + indexY) / 2;
 
         cbRef.current.onFrame?.({
           present: true,
