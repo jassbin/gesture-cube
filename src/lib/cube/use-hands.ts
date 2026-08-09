@@ -76,6 +76,7 @@ export function useHandTracking(cbs: Callbacks) {
   // FREE / LOCKED face state machine
   const lockState = useRef<"free" | "locked">("free");
   const lockSpan = useRef(0.15);
+  const prevTier = useRef(0);
   const stillSince = useRef(0);
   const prevMid = useRef<{ x: number; y: number } | null>(null);
   const lockTwistStart = useRef<{ x: number; y: number } | null>(null);
