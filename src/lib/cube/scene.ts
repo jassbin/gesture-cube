@@ -206,6 +206,39 @@ export class CubeScene {
     return this.axisLayerToMove(axis, layer, rotSign);
   }
 
+  // Highlight the cubie whose face is under the given screen point (0..1,
+  // as the user sees it). Returns true when a face is hit, false otherwise.
+  // Used to give a "you're grabbing this face" cue while pinching.
+  private hlBody: THREE.Mesh | null = null;
+  pickFaceAt(nx: number, ny: number): boolean {
+    const ndc = new THREE.Vector2(nx * 2 - 1, -(ny * 2 - 1));
+    this.raycaster.setFromCamera(ndc, this.camera);
+    const hits = this.raycaster.intersectObjects(this.pickables, false);
+    const body = (hits[0]?.object as THREE.Mesh) ?? null;
+    if (body === this.hlBody) return !!body;
+    // clear previous
+    if (this.hlBody) {
+      const m = this.hlBody.material as THREE.MeshStandardMaterial;
+      m.emissive.setHex(0x000000);
+      m.emissiveIntensity = 0;
+    }
+    this.hlBody = body;
+    if (body) {
+      const m = body.material as THREE.MeshStandardMaterial;
+      m.emissive.setHex(0xffb020);
+      m.emissiveIntensity = 0.65;
+    }
+    return !!body;
+  }
+
+  clearFaceHighlight() {
+    if (!this.hlBody) return;
+    const m = this.hlBody.material as THREE.MeshStandardMaterial;
+    m.emissive.setHex(0x000000);
+    m.emissiveIntensity = 0;
+    this.hlBody = null;
+  }
+
   private snapAxis(
     v: THREE.Vector3,
   ): { axis: "x" | "y" | "z"; sign: number } | null {
