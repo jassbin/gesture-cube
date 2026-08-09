@@ -192,7 +192,7 @@ export function useHandTracking(cbs: Callbacks) {
       setStatus("requesting");
       try {
         const stream = await navigator.mediaDevices.getUserMedia({
-          video: { facingMode: { ideal: "environment" } },
+          video: { facingMode: { ideal: "user" } },
           audio: false,
         });
         streamRef.current = stream;
