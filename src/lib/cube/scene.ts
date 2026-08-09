@@ -333,7 +333,6 @@ export class CubeScene {
     indexX: number,
     indexY: number,
     freeze = false,
-    depth = 1,
   ): boolean {
     // When frozen (face locked), keep the current face and only refresh the
     // two touched cubes — no re-voting, so the locked face never jumps.
@@ -348,8 +347,8 @@ export class CubeScene {
       // highlighting those SAME meshes (they ride the face as it turns) instead
       // of re-picking under the moving fingertips.
       if (!this.lockedTips) {
-        const a = this.bodyAtDepth(thumbX, thumbY, depth);
-        const b = this.bodyAtDepth(indexX, indexY, depth);
+        const a = this.bodyAt(thumbX, thumbY);
+        const b = this.bodyAt(indexX, indexY);
         this.lockedTips = [a, b].filter((m): m is THREE.Mesh => !!m);
       }
       this.highlightTips(this.lockedTips);
@@ -414,22 +413,20 @@ export class CubeScene {
     }
 
     // (2) the two exact cubes each finger is touching — bright, every frame
-    this.refreshTips(thumbX, thumbY, indexX, indexY, depth);
+    this.refreshTips(thumbX, thumbY, indexX, indexY);
     return true;
   }
 
-  // Update the two bright "touched cube" markers under each fingertip.
-  // `depth` (hand-size ratio) picks how deep along the ray we select: >1 keeps
-  // the front (outer) cube, <1 pushes selection into inner cubes ("far=small").
+  // Update the two bright "touched cube" markers under each fingertip
+  // (front-most cube the ray hits — pure 2D).
   private refreshTips(
     thumbX: number,
     thumbY: number,
     indexX: number,
     indexY: number,
-    depth = 1,
   ) {
-    const tThumb = this.bodyAtDepth(thumbX, thumbY, depth);
-    const tIndex = this.bodyAtDepth(indexX, indexY, depth);
+    const tThumb = this.bodyAt(thumbX, thumbY);
+    const tIndex = this.bodyAt(indexX, indexY);
     this.highlightTips([tThumb, tIndex].filter((m): m is THREE.Mesh => !!m));
   }
 
