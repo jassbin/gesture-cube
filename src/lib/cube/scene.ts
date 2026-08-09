@@ -108,9 +108,9 @@ export class CubeScene {
           const edges = new THREE.LineSegments(
             new THREE.EdgesGeometry(new THREE.BoxGeometry(s, s, s)),
             new THREE.LineBasicMaterial({
-              color: 0x35e0ff,
+              color: 0x1177aa,
               transparent: true,
-              opacity: 0.85,
+              opacity: 0.9,
               depthTest: false,
             }),
           );
