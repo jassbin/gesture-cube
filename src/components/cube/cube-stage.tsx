@@ -333,15 +333,12 @@ export function CubeStage() {
         gestureFlash={gestureFlash}
       />
 
-      {/* gyro permission prompt */}
-      {gyro.status === "need-permission" && (
-        <button
-          data-el="gyro-permission"
-          onClick={gyro.start}
-          className="fui-chip absolute left-1/2 top-[42%] z-30 -translate-x-1/2 rounded-full px-4 py-2 text-xs font-semibold text-white"
-        >
-          {t("play.enableGyro")}
-        </button>
+      {/* one-time onboarding — all "how to play" + permissions in one place */}
+      {showIntro && (
+        <GestureIntro
+          onStart={enableCamera}
+          onCancel={() => setShowIntro(false)}
+        />
       )}
 
       {/* single bottom status line — never overlaps the cube */}
