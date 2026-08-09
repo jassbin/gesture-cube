@@ -124,6 +124,8 @@ export function useHandTracking(cbs: Callbacks) {
           y: cy,
           landmarks: pts.map((p) => ({ x: p.x, y: p.y })),
           pinching,
+          pinchX: mx,
+          pinchY: my,
           fps,
         });
 
@@ -180,6 +182,8 @@ export function useHandTracking(cbs: Callbacks) {
           y: 0.5,
           landmarks: [],
           pinching: false,
+          pinchX: 0.5,
+          pinchY: 0.5,
           fps,
         });
       }
