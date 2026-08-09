@@ -452,6 +452,27 @@ export class CubeScene {
     return (hits[0].object as THREE.Mesh) ?? null;
   }
 
+  // From the LOCKED face's own cubies (this.hlBodies), pick the one whose
+  // center projects closest to the given screen point. Guarantees the pinned
+  // dot is always a cube that belongs to the selected face — never outside it.
+  private nearestFaceBody(nx: number, ny: number): THREE.Mesh | null {
+    if (this.hlBodies.length === 0) return this.bodyAt(nx, ny);
+    const target = new THREE.Vector2(nx * 2 - 1, -(ny * 2 - 1));
+    const world = new THREE.Vector3();
+    let best: THREE.Mesh | null = null;
+    let bestD = Infinity;
+    for (const body of this.hlBodies) {
+      body.getWorldPosition(world);
+      const p = world.clone().project(this.camera); // → NDC
+      const d = (p.x - target.x) ** 2 + (p.y - target.y) ** 2;
+      if (d < bestD) {
+        bestD = d;
+        best = body;
+      }
+    }
+    return best;
+  }
+
   // Returns the grabbed slice: axis, the outward face sign, and the layer
   // coordinate (lyr) along that axis (outer=sign, middle=0, inner=-sign).
   grabbedFace(): {
