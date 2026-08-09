@@ -66,7 +66,7 @@
       "reset": "重置",
       "mode": "模式切换"
     },
-    "experimentalSwipe": "实验手势：识别可能不稳，拧不动时请在魔方面上滑动",
+    "experimentalSwipe": "伸出食指指向某个面，朝要拧的方向拖动即可拧动该层（实验，识别可能不稳）",
     "solvedTitle": "还原完成！",
     "solvedTime": "用时",
     "solvedMoves": "步数",
