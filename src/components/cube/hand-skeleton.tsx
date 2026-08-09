@@ -36,10 +36,10 @@ export function HandSkeleton({ frame }: { frame: HandFrame | null }) {
     const py = (p: { y: number }) => p.y * H;
 
     ctx.strokeStyle = "rgba(0,255,136,0.95)";
-    ctx.lineWidth = 5;
+    ctx.lineWidth = 10;
     ctx.lineCap = "round";
     ctx.shadowColor = "rgba(0,255,136,0.9)";
-    ctx.shadowBlur = 14;
+    ctx.shadowBlur = 22;
     CONNECTIONS.forEach(([a, b]) => {
       const pa = frame.landmarks[a];
       const pb = frame.landmarks[b];
@@ -52,7 +52,7 @@ export function HandSkeleton({ frame }: { frame: HandFrame | null }) {
     const TIPS = new Set([4, 8, 12, 16, 20]);
     ctx.fillStyle = "#00FF88";
     frame.landmarks.forEach((p, i) => {
-      const r = TIPS.has(i) ? 11 : 8;
+      const r = TIPS.has(i) ? 22 : 16;
       ctx.beginPath();
       ctx.arc(px(p), py(p), r, 0, Math.PI * 2);
       ctx.fill();
@@ -63,7 +63,7 @@ export function HandSkeleton({ frame }: { frame: HandFrame | null }) {
     frame.landmarks.forEach((p, i) => {
       if (!TIPS.has(i)) return;
       ctx.beginPath();
-      ctx.arc(px(p), py(p), 4, 0, Math.PI * 2);
+      ctx.arc(px(p), py(p), 8, 0, Math.PI * 2);
       ctx.fill();
     });
   }, [frame]);

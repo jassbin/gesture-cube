@@ -242,7 +242,7 @@ export class CubeScene {
     // the camera physically orbits the fixed cube instead of only rotating it.
     this.camera.position.x = this.parallax.y * 3.2;
     this.camera.position.y = -this.parallax.x * 3.2;
-    this.camera.position.z = 12 - Math.abs(this.parallax.x + this.parallax.y) * 0.6;
+    this.camera.position.z = 24 - Math.abs(this.parallax.x + this.parallax.y) * 0.6;
     this.camera.lookAt(0, 0, 0);
 
     this.renderer.render(this.scene, this.camera);
