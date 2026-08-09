@@ -340,32 +340,27 @@ export function CubeStage() {
         </button>
       )}
 
-      {/* pinch cue: preview (hold to lock, shows layer) vs locked (turn) */}
-      {mode === "gesture" && cameraActive && frame?.pinching && (
-        <div className="pointer-events-none absolute inset-x-0 top-[38%] z-20 flex justify-center px-8">
-          <div
-            className={cn(
-              "fui-chip rounded-full px-4 py-2 text-xs font-semibold",
-              frame.locked
-                ? "text-[#ff8c00] fui-glow-orange"
-                : "text-[#ffd54a]",
-            )}
-          >
-            {frame.locked
-              ? t("play.faceLocked")
-              : `${t("play.pinchHold")} · ${t(
-                  "play.layerNames." + CubeScene.depthTier(frame.depth),
-                )}`}
-          </div>
-        </div>
-      )}
-
-      {/* experimental gesture hint — kept near the bottom, clear of banner/flash */}
+      {/* single bottom status line — never overlaps the cube */}
       {mode === "gesture" && cameraActive && (
         <div className="pointer-events-none absolute inset-x-0 bottom-[150px] z-20 px-8 text-center">
-          <p className="fui-mono text-[10px] uppercase tracking-wider text-secondary/90">
-            {t("play.experimentalSwipe")}
-          </p>
+          {frame?.pinching ? (
+            <p
+              className={cn(
+                "fui-mono text-xs font-semibold tracking-wide",
+                frame.locked ? "text-[#ff8c00]" : "text-[#ffd54a]",
+              )}
+            >
+              {frame.locked
+                ? t("play.faceLocked")
+                : `${t("play.pinchHold")} · ${t(
+                    "play.layerNames." + CubeScene.depthTier(frame.depth),
+                  )}`}
+            </p>
+          ) : (
+            <p className="fui-mono text-[10px] uppercase tracking-wider text-secondary/90">
+              {t("play.experimentalSwipe")}
+            </p>
+          )}
         </div>
       )}
       {mode === "touch" && (
