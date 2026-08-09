@@ -66,7 +66,8 @@
       "reset": "重置",
       "mode": "模式切换"
     },
-    "experimentalSwipe": "伸出食指指向某个面，朝要拧的方向拖动即可拧动该层（实验，识别可能不稳）",
+    "experimentalSwipe": "用大拇指和食指捏住某个面（捏住时该面会亮起），朝要拧的方向拖动再松手即可拧动该层（实验，无深度信息，识别可能不稳）",
+    "pinchGrab": "已捏住此面 · 拖动后松手拧层",
     "solvedTitle": "还原完成！",
     "solvedTime": "用时",
     "solvedMoves": "步数",

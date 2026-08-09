@@ -66,7 +66,8 @@
       "reset": "Reset",
       "mode": "Switch mode"
     },
-    "experimentalSwipe": "Point your index finger at a face and drag toward the way you want it to turn (experimental — tracking may wobble)",
+    "experimentalSwipe": "Pinch a face with thumb + index (the face lights up when grabbed), drag the way you want it to turn, then release to twist that layer (experimental — no depth data, tracking may wobble)",
+    "pinchGrab": "Face grabbed · drag then release to twist",
     "solvedTitle": "Solved!",
     "solvedTime": "Time",
     "solvedMoves": "Moves",
