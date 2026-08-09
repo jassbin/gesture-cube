@@ -22,34 +22,32 @@ export function useCubeGame() {
   const [result, setResult] = useState<SolveResult | null>(null);
   const stateRef = useRef<CubeState>(solvedState());
   const startRef = useRef<number>(0);
+  const movesRef = useRef(0);
+  const statusRef = useRef<GameStatus>("idle");
 
   const applyLogical = useCallback(
     (move: Move): { solved: boolean; result: SolveResult | null } => {
       stateRef.current = applyMove(stateRef.current, move);
-      let nextMoves = 0;
-      setMoves((m) => {
-        nextMoves = m + 1;
-        return nextMoves;
-      });
-      if (status === "solving" && isSolved(stateRef.current)) {
-        const timeMs = Date.now() - startRef.current;
-        const res = { timeMs, moves: nextMoves };
+      movesRef.current += 1;
+      setMoves(movesRef.current);
+      if (statusRef.current === "solving" && isSolved(stateRef.current)) {
+        const res = { timeMs: Date.now() - startRef.current, moves: movesRef.current };
         setResult(res);
+        statusRef.current = "solved";
         setStatus("solved");
         return { solved: true, result: res };
       }
       return { solved: false, result: null };
     },
-    [status],
+    [],
   );
 
-  // Returns the sequence of moves to visually replay the scramble.
   const doScramble = useCallback((): Move[] => {
     const { moves: seq } = scramble(stateRef.current, 24);
-    // We DON'T apply to stateRef here; caller applies each move through
-    // applyLogical as the visual animation completes to keep sync.
+    movesRef.current = 0;
     setMoves(0);
     setResult(null);
+    statusRef.current = "solving";
     setStatus("solving");
     startRef.current = Date.now();
     return seq;
@@ -57,12 +55,13 @@ export function useCubeGame() {
 
   const reset = useCallback(() => {
     stateRef.current = solvedState();
+    movesRef.current = 0;
     setMoves(0);
     setResult(null);
+    statusRef.current = "idle";
     setStatus("idle");
   }, []);
 
-  // begin timing only after scramble visual finishes
   const markStart = useCallback(() => {
     startRef.current = Date.now();
   }, []);
