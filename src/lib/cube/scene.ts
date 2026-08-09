@@ -140,9 +140,9 @@ export class CubeScene {
   }
 
   setParallax(nx: number, ny: number) {
-    // nx, ny in roughly [-1,1]
-    this.targetParallax.x = THREE.MathUtils.clamp(ny, -1, 1) * 0.45;
-    this.targetParallax.y = THREE.MathUtils.clamp(nx, -1, 1) * 0.6;
+    // nx, ny in roughly [-1,1]. Stronger amplitude → more pronounced stereo.
+    this.targetParallax.x = THREE.MathUtils.clamp(ny, -1, 1) * 0.7;
+    this.targetParallax.y = THREE.MathUtils.clamp(nx, -1, 1) * 0.95;
   }
 
   // gesture whole-cube spin — incremental deltas
@@ -238,9 +238,11 @@ export class CubeScene {
 
     this.root.rotation.x = -0.5 + this.parallax.x + this.spin.x;
     this.root.rotation.y = 0.6 + this.parallax.y + this.spin.y;
-    // subtle camera parallax for stereo illusion
-    this.camera.position.x = this.parallax.y * 1.2;
-    this.camera.position.y = -this.parallax.x * 1.2;
+    // Stronger camera parallax = a much more convincing stereo/depth illusion:
+    // the camera physically orbits the fixed cube instead of only rotating it.
+    this.camera.position.x = this.parallax.y * 3.2;
+    this.camera.position.y = -this.parallax.x * 3.2;
+    this.camera.position.z = 8.5 - Math.abs(this.parallax.x + this.parallax.y) * 0.6;
     this.camera.lookAt(0, 0, 0);
 
     this.renderer.render(this.scene, this.camera);
