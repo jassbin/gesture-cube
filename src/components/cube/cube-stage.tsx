@@ -127,17 +127,28 @@ export function CubeStage() {
   });
 
   // ---- hand tracking gesture handling ----
-  const onSpin = useCallback((dx: number, dy: number) => {
-    sceneRef.current?.addSpin(dx, dy);
-  }, []);
+  const onSpin = useCallback(
+    (dx: number, dy: number) => {
+      sceneRef.current?.addSpin(dx, dy);
+      // Flash "rotating" when the hand actually moves the cube (throttled).
+      const mag = Math.hypot(dx, dy);
+      const now = performance.now();
+      if (mag > 0.06 && now - lastRotateFlash.current > 500) {
+        lastRotateFlash.current = now;
+        showFlash("rotate");
+      }
+    },
+    [showFlash],
+  );
 
   const onSwipe = useCallback(
     (dir: SwipeDir) => {
       if (mode !== "gesture" || scramblingRef.current) return;
+      showFlash("twist");
       const move = swipeToMove(dir);
       runTurn(move);
     },
-    [mode, runTurn],
+    [mode, runTurn, showFlash],
   );
 
   const hands = useHandTracking({
@@ -256,6 +267,7 @@ export function CubeStage() {
         moves={game.moves}
         frame={mode === "gesture" ? frame : null}
         mode={mode}
+        gestureFlash={gestureFlash}
       />
 
       {/* gyro permission prompt */}
