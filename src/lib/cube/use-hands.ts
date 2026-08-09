@@ -261,7 +261,7 @@ export function useHandTracking(cbs: Callbacks) {
             const sdy = cy - prev.y;
             // Only spin the whole cube if the two fingertips are actually ON
             // the cube (checked by the scene via raycast) — no touch, no spin.
-            cbRef.current.onSpin?.(sdx * 5.5, sdy * 5.5, thumbX, thumbY, indexX, indexY);
+            cbRef.current.onSpin?.(-sdx * 5.5, sdy * 5.5, thumbX, thumbY, indexX, indexY);
           }
           prevPalm.current = { x: cx, y: cy, t: now };
         }
