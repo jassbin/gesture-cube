@@ -85,5 +85,9 @@
     "touch": "触屏",
     "signInPrompt": "登录后即可保存并查看你的成绩",
     "share": "分享成绩"
+  },
+  "share": {
+    "openComposer": "分享成绩",
+    "retry": "打开分享失败，点击重试"
   }
 }
