@@ -66,9 +66,14 @@
       "reset": "Reset",
       "mode": "Switch mode"
     },
-    "experimentalSwipe": "Pinch a face → hold still to lock the whole face → turn your fingers to twist it; move your hand away from the camera to unlock (experimental — no depth, uses hold-to-lock)",
-    "pinchHold": "Pinch and hold still to lock the face",
+    "experimentalSwipe": "Pinch a cube → move your hand nearer/farther to pick a layer (near=outer / far=inner) → hold still to lock the whole face → turn your fingers to twist; move your hand away to unlock (experimental — depth faked from hand size)",
+    "pinchHold": "Hold to lock",
     "faceLocked": "Face locked · turn to twist, move away to unlock",
+    "layerNames": {
+      "0": "Outer",
+      "1": "Middle",
+      "2": "Inner"
+    },
     "solvedTitle": "Solved!",
     "solvedTime": "Time",
     "solvedMoves": "Moves",
