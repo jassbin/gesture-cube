@@ -187,14 +187,10 @@ export function useHandTracking(cbs: Callbacks) {
             stillSince.current = 0;
           }
         } else {
-          // LOCKED — unlock only when the hand shrinks a LOT (clearly pulled
-          // far from camera). Kept loose so selecting the inner layer (a modest
-          // pull-back) never accidentally breaks the lock.
-          if (handSpan < lockSpan.current * 0.6) {
-            lockState.current = "free";
-            stillSince.current = 0;
-            lockTwistStart.current = null;
-          }
+          // LOCKED — stays locked until the fingers are OPENED (pinch released,
+          // handled by the !pinching branch above). Moving the hand
+          // nearer/farther no longer changes the layer or breaks the lock, so
+          // you can only turn this one face until you take your fingers off it.
         }
         prevMid.current = { x: mx, y: my };
         const locked = lockState.current === "locked";
