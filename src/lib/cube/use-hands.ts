@@ -73,6 +73,10 @@ export function useHandTracking(cbs: Callbacks) {
   const lastTwist = useRef(0);
   const runningRef = useRef(false);
   const frameTimes = useRef<number[]>([]);
+  // hysteresis + smoothing state
+  const pinchState = useRef(false);
+  const smThumb = useRef<{ x: number; y: number } | null>(null);
+  const smIndex = useRef<{ x: number; y: number } | null>(null);
 
   const stop = useCallback(() => {
     runningRef.current = false;
