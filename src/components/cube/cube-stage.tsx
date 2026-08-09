@@ -340,8 +340,6 @@ export function CubeStage() {
         </button>
       )}
 
-      {/* pinch cue: preview (hold to lock) vs locked (turn to twist) */}
-      {mode === "gesture" && cameraActive && frame?.pinching && (
       {/* pinch cue: preview (hold to lock, shows layer) vs locked (turn) */}
       {mode === "gesture" && cameraActive && frame?.pinching && (
         <div className="pointer-events-none absolute inset-x-0 top-[38%] z-20 flex justify-center px-8">
