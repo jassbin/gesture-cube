@@ -414,7 +414,7 @@ export function CubeStage() {
         className="absolute inset-x-0 z-30 flex flex-col items-center gap-3 px-4"
         style={{ bottom: "82px" }}
       >
-        <div className="flex items-center gap-2">
+        <div className="grid w-full max-w-sm grid-cols-3 gap-2">
           <ControlButton
             el="btn-scramble"
             icon={<Shuffle className="h-4 w-4" />}
