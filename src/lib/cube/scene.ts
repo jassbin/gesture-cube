@@ -344,7 +344,15 @@ export class CubeScene {
         m.emissive.setHex(0xff8c00);
         m.emissiveIntensity = 0.95;
       }
-      this.refreshTips(thumbX, thumbY, indexX, indexY, depth);
+      // Pin the two touched cubes the FIRST frame we're locked; afterwards keep
+      // highlighting those SAME meshes (they ride the face as it turns) instead
+      // of re-picking under the moving fingertips.
+      if (!this.lockedTips) {
+        const a = this.bodyAtDepth(thumbX, thumbY, depth);
+        const b = this.bodyAtDepth(indexX, indexY, depth);
+        this.lockedTips = [a, b].filter((m): m is THREE.Mesh => !!m);
+      }
+      this.highlightTips(this.lockedTips);
       return true;
     }
     const voted = this.voteFace(
