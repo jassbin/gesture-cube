@@ -493,8 +493,8 @@ function ControlButton({
           : "text-white",
       )}
     >
-      {icon}
-      {label}
+      <span className="shrink-0">{icon}</span>
+      <span className="truncate">{label}</span>
     </button>
   );
 }
