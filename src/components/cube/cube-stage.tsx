@@ -177,20 +177,35 @@ export function CubeStage() {
     onFingerTwist,
   });
 
-  // ---- live face highlight while pinching (shows which face you're grabbing) ----
+  // ---- live face highlight while pinching ----
+  // FREE + pinching → show only the two touched cubes (preview).
+  // LOCKED → light the whole grabbed face and freeze it (no re-vote).
   const [pinchHit, setPinchHit] = useState(false);
   useEffect(() => {
     const scene = sceneRef.current;
     if (!scene) return;
     if (mode === "gesture" && hands.status === "active" && frame?.pinching) {
-      const hit = scene.pickFaceAt(
-        frame.thumbX,
-        frame.thumbY,
-        frame.indexX,
-        frame.indexY,
-      );
-      setPinchHit(hit);
-      grabbedFace.current = hit ? scene.grabbedFace() : null;
+      if (frame.locked) {
+        const hit = scene.pickFaceAt(
+          frame.thumbX,
+          frame.thumbY,
+          frame.indexX,
+          frame.indexY,
+          true, // freeze: keep the locked face, don't re-vote
+        );
+        setPinchHit(hit);
+        grabbedFace.current = hit ? scene.grabbedFace() : null;
+      } else {
+        // preview: only the two touched cubes, face not locked yet
+        scene.showTipsOnly(
+          frame.thumbX,
+          frame.thumbY,
+          frame.indexX,
+          frame.indexY,
+        );
+        setPinchHit(false);
+        grabbedFace.current = null;
+      }
     } else {
       scene.clearFaceHighlight();
       setPinchHit(false);
