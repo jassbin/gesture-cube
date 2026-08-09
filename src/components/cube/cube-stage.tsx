@@ -37,6 +37,7 @@ export function CubeStage() {
   const scramblingRef = useRef(false);
 
   const [mode, setMode] = useState<Mode>("touch");
+  const [showIntro, setShowIntro] = useState(false);
   const [frame, setFrame] = useState<HandFrame | null>(null);
   const [displayTime, setDisplayTime] = useState("0.00");
   const [gestureFlash, setGestureFlash] = useState<
@@ -243,9 +244,12 @@ export function CubeStage() {
 
   const enableCamera = useCallback(async () => {
     if (!videoRef.current) return;
+    setShowIntro(false);
+    // request both permissions right after the user's explicit "Start" tap
+    if (gyro.status === "need-permission") gyro.start();
     await hands.start(videoRef.current);
     setMode("gesture");
-  }, [hands]);
+  }, [hands, gyro]);
 
   // React to a camera denial reported by the tracking hook (event-driven,
   // toast only — mode stays touch because gesture never activated).
