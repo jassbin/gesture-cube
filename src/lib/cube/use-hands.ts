@@ -18,6 +18,9 @@ export type HandFrame = {
   pinching: boolean;
   // true once a pinch has held still long enough to lock the whole face
   locked: boolean;
+  // true when the hand is open (palm-like): whole-cube rotation mode. In this
+  // state we show a translucent hand instead of the two fingertip dots.
+  palm: boolean;
   // hand size relative to the size at pinch start (>1 = closer/bigger,
   // <1 = farther/smaller). Drives "far=small=inner layer" depth selection.
   depth: number;
