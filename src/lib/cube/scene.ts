@@ -64,7 +64,7 @@ export class CubeScene {
     this.renderer.setClearColor(0x000000, 0);
     this.scene = new THREE.Scene();
     this.camera = new THREE.PerspectiveCamera(38, 1, 0.1, 100);
-    this.camera.position.set(0, 0, 12);
+    this.camera.position.set(0, 0, 24);
 
     this.root = new THREE.Group();
     this.root.rotation.set(-0.5, 0.6, 0);
