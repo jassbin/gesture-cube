@@ -206,26 +206,67 @@ export class CubeScene {
     return this.axisLayerToMove(axis, layer, rotSign);
   }
 
-  // Highlight the whole outer face under the given screen point (0..1, as the
-  // user sees it): all 9 cubies on the face the pinch is grabbing light up.
-  // Returns true when a face is hit, false otherwise.
+  // Highlight the whole outer face the pinch is grabbing. We sample several
+  // points along the thumb→index segment and vote: the face covered by the
+  // most sample points wins. This fixes the "midpoint lands on an edge and
+  // picks the wrong (perpendicular) face" problem — what matters is which
+  // single face the two fingers together are touching.
   private hlBodies: THREE.Mesh[] = [];
   private hlKey: string | null = null;
-  pickFaceAt(nx: number, ny: number): boolean {
-    const ndc = new THREE.Vector2(nx * 2 - 1, -(ny * 2 - 1));
-    this.raycaster.setFromCamera(ndc, this.camera);
-    const hits = this.raycaster.intersectObjects(this.pickables, false);
-    const hit = hits[0];
-    if (!hit || !hit.face) {
-      this.clearFaceHighlight();
-      return false;
+
+  private voteFace(
+    samples: { x: number; y: number }[],
+  ): { axis: "x" | "y" | "z"; sign: number } | null {
+    const tally = new Map<
+      string,
+      { axis: "x" | "y" | "z"; sign: number; n: number }
+    >();
+    for (const p of samples) {
+      const ndc = new THREE.Vector2(p.x * 2 - 1, -(p.y * 2 - 1));
+      this.raycaster.setFromCamera(ndc, this.camera);
+      const hit = this.raycaster.intersectObjects(this.pickables, false)[0];
+      if (!hit || !hit.face) continue;
+      const nWorld = hit.face.normal
+        .clone()
+        .transformDirection(hit.object.matrixWorld)
+        .normalize();
+      const face = this.snapAxis(nWorld);
+      if (!face) continue;
+      const key = `${face.axis}${face.sign}`;
+      const cur = tally.get(key);
+      if (cur) cur.n += 1;
+      else tally.set(key, { ...face, n: 1 });
     }
-    // world-space normal of the touched face → snap to nearest cube axis
-    const nWorld = hit.face.normal
-      .clone()
-      .transformDirection(hit.object.matrixWorld)
-      .normalize();
-    const face = this.snapAxis(nWorld);
+    let best: { axis: "x" | "y" | "z"; sign: number; n: number } | null = null;
+    for (const v of tally.values()) if (!best || v.n > best.n) best = v;
+    return best ? { axis: best.axis, sign: best.sign } : null;
+  }
+
+  private pinchSamples(
+    thumbX: number,
+    thumbY: number,
+    indexX: number,
+    indexY: number,
+  ) {
+    const pts: { x: number; y: number }[] = [];
+    for (let t = 0.15; t <= 0.851; t += 0.1) {
+      pts.push({
+        x: thumbX + (indexX - thumbX) * t,
+        y: thumbY + (indexY - thumbY) * t,
+      });
+    }
+    return pts;
+  }
+
+  pickFaceAt(
+    thumbX: number,
+    thumbY: number,
+    indexX: number,
+    indexY: number,
+  ): boolean {
+    const face = this.voteFace(
+      this.pinchSamples(thumbX, thumbY, indexX, indexY),
+    );
     if (!face) {
       this.clearFaceHighlight();
       return false;
