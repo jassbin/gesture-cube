@@ -328,7 +328,12 @@ export class CubeScene {
     for (const k of this.faceHist) counts.set(k, (counts.get(k) ?? 0) + 1);
     let stableKey = this.hlKey ?? votedKey;
     let bestN = -1;
-    for (const [k, n] of counts) if (n > bestN) (bestN = n), (stableKey = k);
+    for (const [k, n] of counts) {
+      if (n > bestN) {
+        bestN = n;
+        stableKey = k;
+      }
+    }
     // only switch away from the current face when the new one is clearly ahead
     if (this.hlKey && stableKey !== this.hlKey) {
       const curN = counts.get(this.hlKey) ?? 0;
