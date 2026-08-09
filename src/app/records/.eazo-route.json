@@ -1,0 +1,8 @@
+{
+  "route": "records",
+  "name": "成绩",
+  "nav_type": "tab",
+  "order_index": 1,
+  "icon": "trophy",
+  "summary": "历史还原成绩"
+}
