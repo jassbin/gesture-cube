@@ -446,11 +446,6 @@ export class CubeScene {
     return (hits[idx].object as THREE.Mesh) ?? null;
   }
 
-  // front-most cube under a screen point (used for face voting)
-  private bodyAt(nx: number, ny: number): THREE.Mesh | null {
-    return this.bodyAtDepth(nx, ny, 1.2);
-  }
-
   grabbedFace(): { axis: "x" | "y" | "z"; sign: number } | null {
     if (!this.hlKey) return null;
     const axis = this.hlKey[0] as "x" | "y" | "z";
