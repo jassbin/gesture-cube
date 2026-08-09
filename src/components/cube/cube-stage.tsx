@@ -343,11 +343,18 @@ export function CubeStage() {
         </button>
       )}
 
-      {/* pinch grab cue — shows when a pinch is actually grabbing a face */}
-      {mode === "gesture" && cameraActive && pinchHit && (
+      {/* pinch cue: preview (hold to lock) vs locked (turn to twist) */}
+      {mode === "gesture" && cameraActive && frame?.pinching && (
         <div className="pointer-events-none absolute inset-x-0 top-[38%] z-20 flex justify-center px-8">
-          <div className="fui-chip rounded-full px-4 py-2 text-xs font-semibold text-[#ffb020] fui-glow-orange">
-            {t("play.pinchGrab")}
+          <div
+            className={cn(
+              "fui-chip rounded-full px-4 py-2 text-xs font-semibold",
+              frame.locked
+                ? "text-[#ffb020] fui-glow-orange"
+                : "text-[#ffd54a]",
+            )}
+          >
+            {t(frame.locked ? "play.faceLocked" : "play.pinchHold")}
           </div>
         </div>
       )}
