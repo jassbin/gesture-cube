@@ -24,13 +24,18 @@ export function HandSkeleton({ frame }: { frame: HandFrame | null }) {
     const W = rect.width;
     const H = rect.height;
     // mirror x so the points feel natural on-screen
-    const px = (p: { x: number }) => (1 - p.x) * W;
+    // rear camera → no mirror
+    const px = (p: { x: number }) => p.x * W;
     const py = (p: { y: number }) => p.y * H;
 
     const thumb = frame.landmarks[4];
     const index = frame.landmarks[8];
     const active = frame.pinching;
-    const color = active ? "255,176,32" : "0,255,136"; // orange when grabbing
+    const color = frame.locked
+      ? "255,176,32"
+      : active
+        ? "255,213,74"
+        : "0,255,136";
 
     // draw the two touch points only
     [thumb, index].forEach((p) => {
