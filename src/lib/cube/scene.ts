@@ -252,8 +252,8 @@ export class CubeScene {
     const axisInfo = this.snapAxis(rot);
     if (!axisInfo) return null;
     const { axis: rAxis, sign: rotSign } = axisInfo;
-    // the layer to turn is the grabbed face's coordinate on that rotation axis
-    const layer = rAxis === axis ? sign : sign;
+    // grabbed an outer face → turn the outer layer on the rotation axis
+    const layer = sign;
     return this.axisLayerToMove(rAxis, layer, rotSign);
   }
 
