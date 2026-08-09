@@ -255,6 +255,7 @@ export class CubeScene {
   private hlBodies: THREE.Mesh[] = [];
   private hlTipBodies: THREE.Mesh[] = [];
   private hlKey: string | null = null;
+  private faceHist: string[] = [];
 
   private voteFace(
     samples: { x: number; y: number; w: number }[],
