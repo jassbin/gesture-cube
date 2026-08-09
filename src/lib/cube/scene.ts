@@ -206,6 +206,40 @@ export class CubeScene {
     return this.axisLayerToMove(axis, layer, rotSign);
   }
 
+  // Twist using a face already chosen by pinch voting (axis+sign in the same
+  // space snapAxis produces) plus a normalized screen drag. Mirrors the math in
+  // solveTwistFromDrag but forces the grabbed face, so the layer that turns is
+  // exactly the highlighted one.
+  solveTwistFromFace(
+    axis: "x" | "y" | "z",
+    sign: number,
+    dxN: number,
+    dyN: number,
+  ): Move | null {
+    if (Math.hypot(dxN, dyN) < 0.02) return null;
+    const nWorld = new THREE.Vector3(
+      axis === "x" ? sign : 0,
+      axis === "y" ? sign : 0,
+      axis === "z" ? sign : 0,
+    );
+    const right = new THREE.Vector3();
+    const up = new THREE.Vector3();
+    this.camera.matrixWorld.extractBasis(right, up, new THREE.Vector3());
+    const drag = right
+      .multiplyScalar(dxN)
+      .add(up.multiplyScalar(-dyN))
+      .normalize();
+    const rot = new THREE.Vector3().crossVectors(nWorld, drag);
+    const axisInfo = this.snapAxis(rot);
+    if (!axisInfo) return null;
+    const { axis: rAxis, sign: rotSign } = axisInfo;
+    // layer along the rotation axis: the grabbed outer face sits at +/-1 on
+    // the face axis; along the rotation axis the touched layer is that face's
+    // sign when they coincide, else the outer layer nearest the drag.
+    const layer = rAxis === axis ? sign : sign;
+    return this.axisLayerToMove(rAxis, layer, rotSign);
+  }
+
   // Highlight the whole outer face the pinch is grabbing. We sample several
   // points along the thumb→index segment and vote: the face covered by the
   // most sample points wins. This fixes the "midpoint lands on an edge and
