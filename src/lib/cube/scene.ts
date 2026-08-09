@@ -253,6 +253,7 @@ export class CubeScene {
   // picks the wrong (perpendicular) face" problem — what matters is which
   // single face the two fingers together are touching.
   private hlBodies: THREE.Mesh[] = [];
+  private hlTipBodies: THREE.Mesh[] = [];
   private hlKey: string | null = null;
 
   private voteFace(
