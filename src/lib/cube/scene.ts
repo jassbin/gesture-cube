@@ -444,25 +444,13 @@ export class CubeScene {
     }
   }
 
-  // Select a cube along the ray by depth. hits[] is sorted front→back.
-  // Thresholds are generous so a modest hand pull-back reaches inner layers.
-  private bodyAtDepth(nx: number, ny: number, depth: number): THREE.Mesh | null {
+  // Select the FRONT-MOST cube the screen ray hits (pure 2D — no depth).
+  private bodyAt(nx: number, ny: number): THREE.Mesh | null {
     const ndc = new THREE.Vector2(nx * 2 - 1, -(ny * 2 - 1));
     this.raycaster.setFromCamera(ndc, this.camera);
     const hits = this.raycaster.intersectObjects(this.pickables, false);
     if (hits.length === 0) return null;
-    const tier = CubeScene.depthTier(depth);
-    const idx = Math.min(tier === 2 ? hits.length - 1 : tier, hits.length - 1);
-    return (hits[idx].object as THREE.Mesh) ?? null;
-  }
-
-  // Depth tier (0=outer, 1=middle, 2=inner) from the hand-size ratio.
-  static depthTier(depth: number): 0 | 1 | 2 {
-    // Wider, easier-to-reach bands so pulling the hand back a little already
-    // penetrates to the middle, and a bit more reaches the inner lattice.
-    if (depth >= 1.02) return 0; // hand grew / neutral → outer face
-    if (depth >= 0.88) return 1; // slight pull-back → middle layer
-    return 2; // clear pull-back → inner (back) block
+    return (hits[0].object as THREE.Mesh) ?? null;
   }
 
   // Returns the grabbed slice: axis, the outward face sign, and the layer
