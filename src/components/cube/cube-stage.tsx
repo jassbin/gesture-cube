@@ -147,11 +147,19 @@ export function CubeStage() {
     [showFlash],
   );
 
-  const onSwipe = useCallback(
-    (dir: SwipeDir) => {
+  const onFingerTwist = useCallback(
+    (twist: { startX: number; startY: number; dx: number; dy: number }) => {
       if (mode !== "gesture" || scramblingRef.current) return;
+      const scene = sceneRef.current;
+      if (!scene) return;
+      const move = scene.solveTwistFromDrag(
+        twist.startX,
+        twist.startY,
+        twist.dx,
+        twist.dy,
+      );
+      if (!move) return;
       showFlash("twist");
-      const move = swipeToMove(dir);
       runTurn(move);
     },
     [mode, runTurn, showFlash],
