@@ -226,6 +226,7 @@ export class CubeScene {
   solveTwistFromFace(
     axis: "x" | "y" | "z",
     sign: number,
+    lyr: number,
     dxN: number,
     dyN: number,
   ): Move | null {
@@ -260,8 +261,8 @@ export class CubeScene {
     const t2 = new THREE.Vector3().crossVectors(nWorld, t1).normalize();
     const along = drag.dot(t2);
     const rotSign = along >= 0 ? 1 : -1;
-    // The layer that turns is the grabbed face's own layer (axis + sign).
-    return this.axisLayerToMove(axis, sign, rotSign);
+    // The layer that turns is the grabbed slice (outer=sign, mid=0, inner=-sign).
+    return this.axisLayerToMove(axis, lyr, rotSign);
   }
 
   // Highlight the whole outer face the pinch is grabbing. We sample several
