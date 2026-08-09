@@ -85,7 +85,9 @@ export function CubeStage() {
           if (r.solved) {
             memory
               .reportAction({
-                action: "solve_cube",
+                content: `Solved the cube in ${r.result?.moves} moves`,
+                event_type: "solve_cube",
+                page: "play",
                 metadata: {
                   type: "cube_solve",
                   timeMs: r.result?.timeMs,
