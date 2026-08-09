@@ -174,14 +174,14 @@ export function CubeStage() {
   useEffect(() => {
     const scene = sceneRef.current;
     if (!scene) return;
-    if (mode === "gesture" && cameraActiveRef.current && frame?.pinching) {
+    if (mode === "gesture" && hands.status === "active" && frame?.pinching) {
       const hit = scene.pickFaceAt(frame.pinchX, frame.pinchY);
       setPinchHit(hit);
     } else {
       scene.clearFaceHighlight();
       setPinchHit(false);
     }
-  }, [frame, mode]);
+  }, [frame, mode, hands.status]);
 
   // ---- controls ----
   const handleScramble = useCallback(() => {
