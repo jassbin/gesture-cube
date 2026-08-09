@@ -159,7 +159,13 @@ export function CubeStage() {
       // the layer that turns is exactly the one shown as grabbed.
       const face = grabbedFace.current;
       const move = face
-        ? scene.solveTwistFromFace(face.axis, face.sign, twist.dx, twist.dy)
+        ? scene.solveTwistFromFace(
+            face.axis,
+            face.sign,
+            face.lyr,
+            twist.dx,
+            twist.dy,
+          )
         : scene.solveTwistFromDrag(
             twist.startX,
             twist.startY,
