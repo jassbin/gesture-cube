@@ -342,16 +342,22 @@ export function CubeStage() {
 
       {/* pinch cue: preview (hold to lock) vs locked (turn to twist) */}
       {mode === "gesture" && cameraActive && frame?.pinching && (
+      {/* pinch cue: preview (hold to lock, shows layer) vs locked (turn) */}
+      {mode === "gesture" && cameraActive && frame?.pinching && (
         <div className="pointer-events-none absolute inset-x-0 top-[38%] z-20 flex justify-center px-8">
           <div
             className={cn(
               "fui-chip rounded-full px-4 py-2 text-xs font-semibold",
               frame.locked
-                ? "text-[#ffb020] fui-glow-orange"
+                ? "text-[#ff8c00] fui-glow-orange"
                 : "text-[#ffd54a]",
             )}
           >
-            {t(frame.locked ? "play.faceLocked" : "play.pinchHold")}
+            {frame.locked
+              ? t("play.faceLocked")
+              : `${t("play.pinchHold")} · ${t(
+                  "play.layerNames." + CubeScene.depthTier(frame.depth),
+                )}`}
           </div>
         </div>
       )}
