@@ -16,6 +16,9 @@ export type HandFrame = {
   landmarks: { x: number; y: number }[];
   // true while thumb + index are pinched together (grabbing a face)
   pinching: boolean;
+  // pinch midpoint in mirrored screen space (0..1), valid while pinching
+  pinchX: number;
+  pinchY: number;
   fps: number;
 };
 
