@@ -435,9 +435,11 @@ export class CubeScene {
 
   // Depth tier (0=outer, 1=middle, 2=inner) from the hand-size ratio.
   static depthTier(depth: number): 0 | 1 | 2 {
-    if (depth >= 1.05) return 0;
-    if (depth >= 0.97) return 1;
-    return 2;
+    // Wider, easier-to-reach bands so pulling the hand back a little already
+    // penetrates to the middle, and a bit more reaches the inner lattice.
+    if (depth >= 1.02) return 0; // hand grew / neutral → outer face
+    if (depth >= 0.88) return 1; // slight pull-back → middle layer
+    return 2; // clear pull-back → inner (back) block
   }
 
   grabbedFace(): { axis: "x" | "y" | "z"; sign: number } | null {
