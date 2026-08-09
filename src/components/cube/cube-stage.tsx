@@ -314,6 +314,15 @@ export function CubeStage() {
         </button>
       )}
 
+      {/* pinch grab cue — shows when a pinch is actually grabbing a face */}
+      {mode === "gesture" && cameraActive && pinchHit && (
+        <div className="pointer-events-none absolute inset-x-0 top-[38%] z-20 flex justify-center px-8">
+          <div className="fui-chip rounded-full px-4 py-2 text-xs font-semibold text-[#ffb020] fui-glow-orange">
+            {t("play.pinchGrab")}
+          </div>
+        </div>
+      )}
+
       {/* experimental gesture hint — kept near the bottom, clear of banner/flash */}
       {mode === "gesture" && cameraActive && (
         <div className="pointer-events-none absolute inset-x-0 bottom-[150px] z-20 px-8 text-center">
