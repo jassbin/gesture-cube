@@ -346,11 +346,7 @@ export function CubeStage() {
                 frame.locked ? "text-[#ff8c00]" : "text-[#ffd54a]",
               )}
             >
-              {frame.locked
-                ? t("play.faceLocked")
-                : `${t("play.pinchHold")} · ${t(
-                    "play.layerNames." + CubeScene.depthTier(frame.depth),
-                  )}`}
+              {frame.locked ? t("play.faceLocked") : t("play.pinchHold")}
             </p>
           ) : (
             <p className="fui-mono text-[10px] uppercase tracking-wider text-secondary/90">
