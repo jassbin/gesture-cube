@@ -108,19 +108,6 @@ export class CubeScene {
             }),
           );
           g.add(body);
-          // wireframe skeleton edges on every cubie so the full 3×3×3 lattice
-          // (including cubes hidden behind) reads clearly as a structure.
-          const edges = new THREE.LineSegments(
-            new THREE.EdgesGeometry(new THREE.BoxGeometry(s, s, s)),
-            new THREE.LineBasicMaterial({
-              color: 0x0c4f6e,
-              transparent: true,
-              opacity: 0.9,
-              depthTest: false,
-            }),
-          );
-          edges.renderOrder = 2;
-          g.add(edges);
           const off = s / 2 + 0.001;
           // attach stickers on exposed faces
           if (x === 1) this.addSticker(g, FACE_COLORS.R, sticker, "x", off);
