@@ -156,6 +156,100 @@ export class CubeScene {
     this.targetSpin.x += dy;
   }
 
+  /**
+   * Real face-twist solving. Given a normalized start point (0..1, screen space
+   * as the user sees it — origin top-left) and a normalized drag delta, ray-cast
+   * to the touched face and derive which layer + direction to turn — exactly how
+   * a real hand would grab a face and twist it.
+   * Returns a Move (or null when the pick misses the cube or the drag is tiny).
+   */
+  solveTwistFromDrag(
+    nx: number,
+    ny: number,
+    dxN: number,
+    dyN: number,
+  ): Move | null {
+    if (Math.hypot(dxN, dyN) < 0.02) return null;
+    // NDC (-1..1); y flipped
+    const ndc = new THREE.Vector2(nx * 2 - 1, -(ny * 2 - 1));
+    this.raycaster.setFromCamera(ndc, this.camera);
+    const hits = this.raycaster.intersectObjects(this.pickables, false);
+    if (hits.length === 0) return null;
+    const hit = hits[0];
+    const cubie = hit.object.userData.cubie as Cubie | undefined;
+    if (!cubie || !hit.face) return null;
+
+    // world-space normal of the touched face
+    const nWorld = hit.face.normal
+      .clone()
+      .transformDirection(hit.object.matrixWorld)
+      .normalize();
+
+    // world-space drag vector from screen delta, along camera right/up
+    const right = new THREE.Vector3();
+    const up = new THREE.Vector3();
+    this.camera.matrixWorld.extractBasis(right, up, new THREE.Vector3());
+    const drag = right
+      .multiplyScalar(dxN)
+      .add(up.multiplyScalar(-dyN))
+      .normalize();
+
+    // rotation axis = face normal × drag, snapped to the nearest cube axis
+    const rot = new THREE.Vector3().crossVectors(nWorld, drag);
+    const axisInfo = this.snapAxis(rot);
+    if (!axisInfo) return null;
+    const { axis, sign: rotSign } = axisInfo;
+
+    // layer coordinate along the rotation axis for the touched cubie
+    const layer = axis === "x" ? cubie.x : axis === "y" ? cubie.y : cubie.z;
+
+    return this.axisLayerToMove(axis, layer, rotSign);
+  }
+
+  private snapAxis(
+    v: THREE.Vector3,
+  ): { axis: "x" | "y" | "z"; sign: number } | null {
+    const ax = Math.abs(v.x);
+    const ay = Math.abs(v.y);
+    const az = Math.abs(v.z);
+    const max = Math.max(ax, ay, az);
+    if (max < 0.2) return null;
+    if (max === ax) return { axis: "x", sign: Math.sign(v.x) || 1 };
+    if (max === ay) return { axis: "y", sign: Math.sign(v.y) || 1 };
+    return { axis: "z", sign: Math.sign(v.z) || 1 };
+  }
+
+  // Map (world rotation axis + layer coord + rotation sign) to a face Move.
+  private axisLayerToMove(
+    axis: "x" | "y" | "z",
+    layer: number,
+    rotSign: number,
+  ): Move {
+    // Find the face on the + or - side of this axis for the given layer.
+    let face: Face;
+    let faceSign: number;
+    if (axis === "x") {
+      face = layer >= 0 ? "R" : "L";
+      faceSign = layer >= 0 ? 1 : -1;
+    } else if (axis === "y") {
+      face = layer >= 0 ? "U" : "D";
+      faceSign = layer >= 0 ? 1 : -1;
+    } else {
+      face = layer >= 0 ? "F" : "B";
+      faceSign = layer >= 0 ? 1 : -1;
+    }
+    // For a middle layer (layer === 0) default to the + face turn — still a
+    // legal quarter turn of the outer layer nearest that face.
+    if (layer === 0) {
+      faceSign = 1;
+      face = axis === "x" ? "R" : axis === "y" ? "U" : "F";
+    }
+    // cw of a face is a -90° turn about its + axis (matches scene.turn()).
+    // Positive rotSign about +axis on the + face reads as counter-clockwise.
+    const cw = rotSign * faceSign < 0;
+    return { face, cw };
+  }
+
   get isAnimating() {
     return this.animating;
   }
