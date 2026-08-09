@@ -42,7 +42,7 @@
     "enableGyro": "Enable motion parallax",
     "enableCamera": "Enable camera gestures",
     "gyroHint": "Tap to allow motion — tilt your phone for real parallax",
-    "cameraHint": "Open the rear camera, pinch a face with thumb + index, hold still to lock the whole face, turn your fingers to twist it, and move your hand away from the camera to unlock",
+    "cameraHint": "Open the rear camera, pinch a face with thumb + index, hold still to lock the whole face, turn your fingers to twist it, and open your fingers to unlock and pick another face",
     "cameraDenied": "No camera access — switched to touch control",
     "hud": {
       "time": "TIME",
@@ -66,9 +66,9 @@
       "reset": "Reset",
       "mode": "Switch mode"
     },
-    "experimentalSwipe": "Pinch a cube → move your hand nearer/farther to pick a layer (near=outer / far=inner) → hold still to lock the whole face → turn your fingers to twist; move your hand away to unlock (experimental — depth faked from hand size)",
+    "experimentalSwipe": "Pinch a cube → move your hand nearer/farther to pick a layer (near=outer / far=inner; inner faces lock too) → hold still to lock the whole face → turn your fingers to twist ONLY that face; open your fingers to unlock and pick another (experimental — depth faked from hand size)",
     "pinchHold": "Hold to lock",
-    "faceLocked": "Face locked · turn to twist, move away to unlock",
+    "faceLocked": "Face locked · turns this face only, open fingers to unlock",
     "layerNames": {
       "0": "Outer",
       "1": "Middle",
