@@ -42,7 +42,7 @@
     "enableGyro": "开启陀螺仪立体感",
     "enableCamera": "开启摄像头手势",
     "gyroHint": "点按以授权体感，转动手机即有立体视差",
-    "cameraHint": "将手伸到后置镜头前，挥掌旋转魔方",
+    "cameraHint": "将手伸到前置摄像头前，伸食指指向某个面拖动来拧层",
     "cameraDenied": "未获得摄像头，已切换为触屏操作",
     "hud": {
       "time": "计时",
