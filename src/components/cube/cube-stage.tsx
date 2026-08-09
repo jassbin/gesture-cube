@@ -27,9 +27,11 @@ export function CubeStage() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
   const sceneRef = useRef<CubeScene | null>(null);
-  const grabbedFace = useRef<{ axis: "x" | "y" | "z"; sign: number } | null>(
-    null,
-  );
+  const grabbedFace = useRef<{
+    axis: "x" | "y" | "z";
+    sign: number;
+    lyr: number;
+  } | null>(null);
   const queueRef = useRef<Move[]>([]);
   const scramblingRef = useRef(false);
 
