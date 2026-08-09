@@ -388,7 +388,7 @@ export class CubeScene {
     }
 
     // (2) the two exact cubes each finger is touching — bright, every frame
-    this.refreshTips(thumbX, thumbY, indexX, indexY);
+    this.refreshTips(thumbX, thumbY, indexX, indexY, depth);
     return true;
   }
 
