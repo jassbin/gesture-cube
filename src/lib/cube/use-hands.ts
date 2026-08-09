@@ -231,7 +231,6 @@ export function useHandTracking(cbs: Callbacks) {
         stillSince.current = 0;
         lockTwistStart.current = null;
         prevMid.current = null;
-        pinchBaseSpan.current = 0;
         smThumb.current = null;
         smIndex.current = null;
         cbRef.current.onFrame?.({
