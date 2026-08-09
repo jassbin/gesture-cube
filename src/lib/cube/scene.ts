@@ -4,12 +4,12 @@ import * as THREE from "three";
 import type { Face, Move } from "@/lib/cube/model";
 
 const FACE_COLORS: Record<Face, number> = {
-  U: 0xcfcfcf, // deeper white / silver
-  D: 0xc79a00, // deep gold
-  F: 0x00b25f, // deep green
-  B: 0x1235b0, // deep blue
-  R: 0xc41f18, // deep red
-  L: 0xc76400, // deep orange
+  U: 0x9a9a9a, // dark silver
+  D: 0x8f6e00, // darker gold
+  F: 0x007a40, // darker green
+  B: 0x0c2585, // darker blue
+  R: 0x8f120d, // darker red
+  L: 0x8f4700, // darker orange
 };
 const PLASTIC = 0x0a1030;
 
@@ -108,7 +108,7 @@ export class CubeScene {
           const edges = new THREE.LineSegments(
             new THREE.EdgesGeometry(new THREE.BoxGeometry(s, s, s)),
             new THREE.LineBasicMaterial({
-              color: 0x1177aa,
+              color: 0x0c4f6e,
               transparent: true,
               opacity: 0.9,
               depthTest: false,
