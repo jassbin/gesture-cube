@@ -157,23 +157,18 @@ export function CubeStage() {
       if (mode !== "gesture" || scramblingRef.current) return;
       const scene = sceneRef.current;
       if (!scene) return;
-      // Prefer the face we've been highlighting (voted from both fingers), so
-      // the layer that turns is exactly the one shown as grabbed.
+      // A twist is only allowed on a LOCKED face. grabbedFace is set only
+      // while a face is locked, so no lock = no twist, and you can only turn
+      // the exact face that is currently locked (never any other face).
       const face = grabbedFace.current;
-      const move = face
-        ? scene.solveTwistFromFace(
-            face.axis,
-            face.sign,
-            face.lyr,
-            twist.dx,
-            twist.dy,
-          )
-        : scene.solveTwistFromDrag(
-            twist.startX,
-            twist.startY,
-            twist.dx,
-            twist.dy,
-          );
+      if (!face) return;
+      const move = scene.solveTwistFromFace(
+        face.axis,
+        face.sign,
+        face.lyr,
+        twist.dx,
+        twist.dy,
+      );
       if (!move) return;
       showFlash("twist");
       runTurn(move);
@@ -204,7 +199,7 @@ export function CubeStage() {
         frame.locked, // freeze only after locking
         frame.depth,
       );
-      grabbedFace.current = hit ? scene.grabbedFace() : null;
+      grabbedFace.current = hit && frame.locked ? scene.grabbedFace() : null;
     } else {
       scene.clearFaceHighlight();
       grabbedFace.current = null;
