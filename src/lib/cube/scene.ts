@@ -37,6 +37,8 @@ function makeSticker(color: number, size: number): THREE.Mesh {
     roughness: 0.35,
     metalness: 0.1,
     emissive: new THREE.Color(color).multiplyScalar(0.06),
+    transparent: true,
+    opacity: 0.78,
   });
   return new THREE.Mesh(geo, mat);
 }
