@@ -42,7 +42,7 @@
     "enableGyro": "Enable motion parallax",
     "enableCamera": "Enable camera gestures",
     "gyroHint": "Tap to allow motion — tilt your phone for real parallax",
-    "cameraHint": "Hold your hand up to the rear camera, wave to rotate",
+    "cameraHint": "Hold your hand up to the front camera, point your index finger at a face and drag to twist it",
     "cameraDenied": "No camera access — switched to touch control",
     "hud": {
       "time": "TIME",
