@@ -85,5 +85,9 @@
     "touch": "Touch",
     "signInPrompt": "Sign in to save and view your records",
     "share": "Share result"
+  },
+  "share": {
+    "openComposer": "Share result",
+    "retry": "Couldn't open the composer — tap to try again"
   }
 }
