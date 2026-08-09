@@ -654,24 +654,49 @@ export class CubeScene {
     if (!pivot) return [];
     const quarters = Math.round(angle / (Math.PI / 2));
     const snapped = quarters * (Math.PI / 2);
-    this.liveTurnUpdate(snapped);
     const layer = this.liveLayer;
-    layer.forEach((c) => this.root.attach(c.mesh));
-    this.root.remove(pivot);
     const axis = this.liveAxis;
     const sign = this.liveSign;
-    this.livePivot = null;
-    this.liveLayer = [];
-    this.animating = false;
+
+    // Smoothly settle from the current angle to the nearest quarter instead of
+    // snapping instantly (which looked like the face "jumped"). The face keeps
+    // moving from exactly where the fingers left it, easing into the legal slot.
+    const start = performance.now();
+    const from = angle;
+    const duration = Math.min(220, 60 + Math.abs(snapped - from) * 120);
+    const finish = () => {
+      this.liveTurnUpdate(snapped);
+      layer.forEach((c) => this.root.attach(c.mesh));
+      this.root.remove(pivot);
+      if (quarters !== 0) {
+        const dir = quarters >= 0 ? 1 : -1;
+        for (let i = 0; i < Math.abs(quarters); i++) {
+          this.updateLogicalPositions(layer, axis, dir);
+        }
+      }
+      this.livePivot = null;
+      this.liveLayer = [];
+      this.animating = false;
+    };
+    const step = () => {
+      if (this.disposed) return;
+      if (this.livePivot !== pivot) return; // superseded
+      const t = Math.min(1, (performance.now() - start) / duration);
+      const e = 1 - Math.pow(1 - t, 3);
+      this.liveTurnUpdate(from + (snapped - from) * e);
+      if (t < 1) requestAnimationFrame(step);
+      else finish();
+    };
+    if (Math.abs(snapped - from) < 1e-4) finish();
+    else requestAnimationFrame(step);
+
+    // Return the logical quarter-turn moves immediately so the game state stays
+    // in sync; the visual eases into place over the next few frames.
     if (quarters === 0) return [];
-    // Update the VISUAL cubie grid coords + build the matching logical Moves.
     const dir = quarters >= 0 ? 1 : -1;
     const move = this.axisLayerToMove(axis, sign, dir);
     const moves: Move[] = [];
-    for (let i = 0; i < Math.abs(quarters); i++) {
-      this.updateLogicalPositions(layer, axis, dir);
-      moves.push(move);
-    }
+    for (let i = 0; i < Math.abs(quarters); i++) moves.push(move);
     return moves;
   }
 
