@@ -200,6 +200,7 @@ export function CubeStage() {
           frame.thumbY,
           frame.indexX,
           frame.indexY,
+          frame.depth,
         );
         grabbedFace.current = null;
       }
