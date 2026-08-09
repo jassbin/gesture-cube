@@ -38,7 +38,14 @@ export type SwipeDir = "left" | "right" | "up" | "down";
 // (what the user sees): start point in 0..1 plus a normalized drag delta.
 type Callbacks = {
   onFrame?: (f: HandFrame) => void;
-  onSpin?: (dx: number, dy: number) => void;
+  onSpin?: (
+    dx: number,
+    dy: number,
+    thumbX: number,
+    thumbY: number,
+    indexX: number,
+    indexY: number,
+  ) => void;
   // Live, 1:1 finger rotation of the locked face. `delta` is the signed angle
   // (radians) the two fingers have rotated since the face was locked.
   onFingerRotate?: (delta: number) => void;
@@ -237,7 +244,9 @@ export function useHandTracking(cbs: Callbacks) {
           if (prev) {
             const sdx = cx - prev.x;
             const sdy = cy - prev.y;
-            cbRef.current.onSpin?.(sdx * 5.5, sdy * 5.5);
+            // Only spin the whole cube if the two fingertips are actually ON
+            // the cube (checked by the scene via raycast) — no touch, no spin.
+            cbRef.current.onSpin?.(sdx * 5.5, sdy * 5.5, thumbX, thumbY, indexX, indexY);
           }
           prevPalm.current = { x: cx, y: cy, t: now };
         }
