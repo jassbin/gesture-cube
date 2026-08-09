@@ -448,11 +448,20 @@ export class CubeScene {
     return 2; // clear pull-back → inner (back) block
   }
 
-  grabbedFace(): { axis: "x" | "y" | "z"; sign: number } | null {
+  // Returns the grabbed slice: axis, the outward face sign, and the layer
+  // coordinate (lyr) along that axis (outer=sign, middle=0, inner=-sign).
+  grabbedFace(): {
+    axis: "x" | "y" | "z";
+    sign: number;
+    lyr: number;
+  } | null {
     if (!this.hlKey) return null;
-    const axis = this.hlKey[0] as "x" | "y" | "z";
-    const sign = this.hlKey.slice(1) === "-1" ? -1 : 1;
-    return { axis, sign };
+    const [ax, sg, ly] = this.hlKey.split(":");
+    return {
+      axis: ax as "x" | "y" | "z",
+      sign: sg === "-1" ? -1 : 1,
+      lyr: Number(ly),
+    };
   }
 
   clearFaceHighlight() {
