@@ -285,6 +285,7 @@ export function useHandTracking(cbs: Callbacks) {
           landmarks: [],
           pinching: false,
           locked: false,
+          palm: false,
           depth: 1,
           pinchX: 0.5,
           pinchY: 0.5,
