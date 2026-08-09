@@ -272,6 +272,10 @@ export class CubeScene {
   // single face the two fingers together are touching.
   private hlBodies: THREE.Mesh[] = [];
   private hlTipBodies: THREE.Mesh[] = [];
+  // While a face is LOCKED the two touched cubes are pinned to these exact
+  // meshes and stop re-picking under the fingertips, so the two dots ride the
+  // face as it turns — until the face is unlocked.
+  private lockedTips: THREE.Mesh[] | null = null;
   private hlKey: string | null = null;
   private faceHist: string[] = [];
 
