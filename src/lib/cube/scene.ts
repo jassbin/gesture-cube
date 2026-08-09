@@ -100,6 +100,9 @@ export class CubeScene {
               color: PLASTIC,
               roughness: 0.6,
               metalness: 0.2,
+              transparent: true,
+              opacity: 0.42,
+              depthWrite: false,
             }),
           );
           g.add(body);
