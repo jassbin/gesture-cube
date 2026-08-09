@@ -99,7 +99,9 @@ export function HandSkeleton({ frame }: { frame: HandFrame | null }) {
 
       // fingers (thick rounded strokes) + rounded fingertips
       FINGERS.forEach((chain) => {
-        octx.lineWidth = thick;
+        const isThumb = chain[0] === 1;
+        const w = isThumb ? thumbThick : thick;
+        octx.lineWidth = w;
         octx.beginPath();
         chain.forEach((i, k) => {
           const p = scr[i];
@@ -109,7 +111,7 @@ export function HandSkeleton({ frame }: { frame: HandFrame | null }) {
         octx.stroke();
         const tip = scr[chain[chain.length - 1]];
         octx.beginPath();
-        octx.arc(tip.x, tip.y, thick / 2, 0, Math.PI * 2);
+        octx.arc(tip.x, tip.y, w / 2, 0, Math.PI * 2);
         octx.fill();
       });
 
