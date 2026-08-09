@@ -168,7 +168,7 @@ export function CubeStage() {
   const hands = useHandTracking({
     onFrame: setFrame,
     onSpin,
-    onSwipe,
+    onFingerTwist,
   });
 
   // ---- controls ----
