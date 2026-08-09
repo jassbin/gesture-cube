@@ -35,10 +35,11 @@ export function HandSkeleton({ frame }: { frame: HandFrame | null }) {
     const px = (p: { x: number }) => (1 - p.x) * W;
     const py = (p: { y: number }) => p.y * H;
 
-    ctx.strokeStyle = "rgba(0,255,136,0.9)";
-    ctx.lineWidth = 2;
-    ctx.shadowColor = "rgba(0,255,136,0.8)";
-    ctx.shadowBlur = 8;
+    ctx.strokeStyle = "rgba(0,255,136,0.95)";
+    ctx.lineWidth = 5;
+    ctx.lineCap = "round";
+    ctx.shadowColor = "rgba(0,255,136,0.9)";
+    ctx.shadowBlur = 14;
     CONNECTIONS.forEach(([a, b]) => {
       const pa = frame.landmarks[a];
       const pb = frame.landmarks[b];
@@ -47,10 +48,22 @@ export function HandSkeleton({ frame }: { frame: HandFrame | null }) {
       ctx.lineTo(px(pb), py(pb));
       ctx.stroke();
     });
+    // Fingertip landmarks drawn larger so the hand reads bigger / more present.
+    const TIPS = new Set([4, 8, 12, 16, 20]);
     ctx.fillStyle = "#00FF88";
-    frame.landmarks.forEach((p) => {
+    frame.landmarks.forEach((p, i) => {
+      const r = TIPS.has(i) ? 11 : 8;
       ctx.beginPath();
-      ctx.arc(px(p), py(p), 3, 0, Math.PI * 2);
+      ctx.arc(px(p), py(p), r, 0, Math.PI * 2);
+      ctx.fill();
+    });
+    // bright white cores on fingertips for a stronger joint look
+    ctx.shadowBlur = 0;
+    ctx.fillStyle = "rgba(255,255,255,0.9)";
+    frame.landmarks.forEach((p, i) => {
+      if (!TIPS.has(i)) return;
+      ctx.beginPath();
+      ctx.arc(px(p), py(p), 4, 0, Math.PI * 2);
       ctx.fill();
     });
   }, [frame]);
