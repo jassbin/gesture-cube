@@ -5,36 +5,31 @@ import type { HandFrame } from "@/lib/cube/use-hands";
 
 type Pt = { x: number; y: number };
 
-// Ordered ring of landmarks that traces a hand-shaped outline: down the
-// pinky side, across the fingertips, out to the thumb, then back along the
-// wrist. Gives a human-like silhouette (all five fingers included).
-const OUTLINE = [20, 19, 16, 12, 8, 7, 4, 3, 2, 1, 0, 17, 18];
+// Finger bone chains (MediaPipe indices) — drawn as thick rounded strokes.
+const FINGERS: number[][] = [
+  [1, 2, 3, 4], // thumb
+  [5, 6, 7, 8], // index
+  [9, 10, 11, 12], // middle
+  [13, 14, 15, 16], // ring
+  [17, 18, 19, 20], // pinky
+];
+// Palm polygon (wrist + finger bases) — filled to join the fingers together.
+const PALM = [0, 1, 5, 9, 13, 17];
 
-// Draw a smooth closed curve through points (midpoint quadratics).
-function smoothPath(ctx: CanvasRenderingContext2D, ring: Pt[]) {
-  if (ring.length < 3) return;
-  const mid = (a: Pt, b: Pt) => ({ x: (a.x + b.x) / 2, y: (a.y + b.y) / 2 });
-  ctx.beginPath();
-  const start = mid(ring[ring.length - 1], ring[0]);
-  ctx.moveTo(start.x, start.y);
-  for (let i = 0; i < ring.length; i++) {
-    const cur = ring[i];
-    const next = ring[(i + 1) % ring.length];
-    const m = mid(cur, next);
-    ctx.quadraticCurveTo(cur.x, cur.y, m.x, m.y);
-  }
-  ctx.closePath();
+function dist(a: Pt, b: Pt) {
+  return Math.hypot(a.x - b.x, a.y - b.y);
 }
 
 /**
- * Two display modes:
- *  - PALM mode (hand open, whole-cube rotation): a single translucent,
- *    human-like hand SILHOUETTE — a soft filled outline, no skeleton lines
- *    or joint dots, so it reads as a hand and isn't scary.
- *  - PINCH / LOCK mode: only the two fingertip touch points (thumb + index).
+ * PALM mode (hand open, whole-cube rotation): a single translucent, human-like
+ * hand — a filled palm plus five rounded fingers. Everything is composited
+ * opaquely on an offscreen canvas first (so palm + fingers merge into ONE
+ * connected silhouette with no internal seams), then stamped back at low alpha.
+ * PINCH / LOCK mode: only the two fingertip touch points (thumb + index).
  */
 export function HandSkeleton({ frame }: { frame: HandFrame | null }) {
   const ref = useRef<HTMLCanvasElement>(null);
+  const offRef = useRef<HTMLCanvasElement | null>(null);
 
   useEffect(() => {
     const cv = ref.current;
@@ -56,20 +51,65 @@ export function HandSkeleton({ frame }: { frame: HandFrame | null }) {
     const py = (p: Pt) => p.y * H;
 
     if (frame.palm) {
-      // ---- translucent human-like hand silhouette ----
-      const c = "0,255,136";
-      const ring: Pt[] = OUTLINE.map((i) => ({ x: px(lm[i]), y: py(lm[i]) }));
-      ctx.lineJoin = "round";
-      ctx.lineCap = "round";
-      ctx.shadowColor = `rgba(${c},0.45)`;
-      ctx.shadowBlur = 24;
-      smoothPath(ctx, ring);
-      ctx.fillStyle = `rgba(${c},0.16)`;
-      ctx.fill();
-      ctx.shadowBlur = 0;
-      ctx.strokeStyle = `rgba(${c},0.5)`;
-      ctx.lineWidth = 3;
-      ctx.stroke();
+      const scr: Pt[] = lm.map((p) => ({ x: px(p), y: py(p) }));
+      // finger thickness scales with hand size on screen
+      const handW = dist(scr[5], scr[17]) || 60;
+      const thick = Math.max(18, handW * 0.42);
+
+      // offscreen buffer at device pixels — compose the hand opaquely so the
+      // palm fill and finger strokes union into one seamless shape
+      let off = offRef.current;
+      if (!off) {
+        off = document.createElement("canvas");
+        offRef.current = off;
+      }
+      off.width = cv.width;
+      off.height = cv.height;
+      const octx = off.getContext("2d");
+      if (!octx) return;
+      octx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      octx.clearRect(0, 0, W, H);
+
+      const green = "#00ff88";
+      octx.fillStyle = green;
+      octx.strokeStyle = green;
+      octx.lineJoin = "round";
+      octx.lineCap = "round";
+
+      // palm (filled)
+      octx.beginPath();
+      PALM.forEach((i, k) => {
+        const p = scr[i];
+        if (k === 0) octx.moveTo(p.x, p.y);
+        else octx.lineTo(p.x, p.y);
+      });
+      octx.closePath();
+      octx.fill();
+
+      // fingers (thick rounded strokes) + rounded fingertips
+      FINGERS.forEach((chain) => {
+        octx.lineWidth = thick;
+        octx.beginPath();
+        chain.forEach((i, k) => {
+          const p = scr[i];
+          if (k === 0) octx.moveTo(p.x, p.y);
+          else octx.lineTo(p.x, p.y);
+        });
+        octx.stroke();
+        const tip = scr[chain[chain.length - 1]];
+        octx.beginPath();
+        octx.arc(tip.x, tip.y, thick / 2, 0, Math.PI * 2);
+        octx.fill();
+      });
+
+      // stamp back translucently as one connected silhouette
+      ctx.save();
+      ctx.setTransform(1, 0, 0, 1, 0, 0);
+      ctx.globalAlpha = 0.24;
+      ctx.shadowColor = "rgba(0,255,136,0.5)";
+      ctx.shadowBlur = 18 * dpr;
+      ctx.drawImage(off, 0, 0);
+      ctx.restore();
       return;
     }
 
