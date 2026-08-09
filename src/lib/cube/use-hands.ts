@@ -36,17 +36,9 @@ export type SwipeDir = "left" | "right" | "up" | "down";
 
 // A real "grab a face and drag" gesture, reported in mirrored screen space
 // (what the user sees): start point in 0..1 plus a normalized drag delta.
-export type FingerTwist = {
-  startX: number;
-  startY: number;
-  dx: number;
-  dy: number;
-};
-
 type Callbacks = {
   onFrame?: (f: HandFrame) => void;
   onSpin?: (dx: number, dy: number) => void;
-  onFingerTwist?: (twist: FingerTwist) => void;
   // Live, 1:1 finger rotation of the locked face. `delta` is the signed angle
   // (radians) the two fingers have rotated since the face was locked.
   onFingerRotate?: (delta: number) => void;
@@ -71,7 +63,6 @@ export function useHandTracking(cbs: Callbacks) {
   const streamRef = useRef<MediaStream | null>(null);
   const rafRef = useRef(0);
   const prevPalm = useRef<{ x: number; y: number; t: number } | null>(null);
-  const lastTwist = useRef(0);
   // finger angle (atan2 of index−thumb) captured when the face locks, and
   // whether a live 1:1 turn is currently in progress.
   const lockBaseAngle = useRef(0);
@@ -86,7 +77,6 @@ export function useHandTracking(cbs: Callbacks) {
   const lockState = useRef<"free" | "locked">("free");
   const stillSince = useRef(0);
   const prevMid = useRef<{ x: number; y: number } | null>(null);
-  const lockTwistStart = useRef<{ x: number; y: number } | null>(null);
 
   const stop = useCallback(() => {
     runningRef.current = false;
@@ -170,7 +160,6 @@ export function useHandTracking(cbs: Callbacks) {
             if (stillSince.current === 0) stillSince.current = now;
             else if (now - stillSince.current > 420) {
               lockState.current = "locked";
-              lockTwistStart.current = { x: mx, y: my };
             }
           } else {
             stillSince.current = 0;
@@ -246,7 +235,6 @@ export function useHandTracking(cbs: Callbacks) {
         pinchState.current = false;
         lockState.current = "free";
         stillSince.current = 0;
-        lockTwistStart.current = null;
         prevMid.current = null;
         smThumb.current = null;
         smIndex.current = null;
