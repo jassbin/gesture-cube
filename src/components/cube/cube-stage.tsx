@@ -16,6 +16,7 @@ import {
 import { useCubeGame } from "@/lib/cube/use-cube-game";
 import { formatTime } from "@/lib/cube/format";
 import type { Move } from "@/lib/cube/model";
+import { applyMove } from "@/lib/cube/model";
 import { HandSkeleton } from "./hand-skeleton";
 import { HudChips } from "./hud-chips";
 import { SolvedSheet } from "./solved-sheet";
