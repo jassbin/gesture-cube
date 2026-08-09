@@ -167,13 +167,17 @@ export function useHandTracking(cbs: Callbacks) {
           lockState.current = "free";
           stillSince.current = 0;
         } else if (lockState.current === "free") {
-          // detect "still" — pinch midpoint barely moving
+          // Lock only once the chosen DEPTH LAYER has settled — so moving the
+          // hand nearer/farther to pick outer/middle/inner never locks early.
+          // tier: 0 outer / 1 middle / 2 inner (same bands as the scene).
+          const tier = depth >= 1.02 ? 0 : depth >= 0.88 ? 1 : 2;
           const pm = prevMid.current;
           const moved = pm ? Math.hypot(mx - pm.x, my - pm.y) : 1;
-          if (moved < 0.012) {
+          const sameTier = tier === prevTier.current;
+          prevTier.current = tier;
+          if (moved < 0.02 && sameTier) {
             if (stillSince.current === 0) stillSince.current = now;
             else if (now - stillSince.current > 420) {
-              // LOCK: remember the hand size so shrinking it later unlocks
               lockState.current = "locked";
               lockSpan.current = handSpan;
               lockTwistStart.current = { x: mx, y: my };
