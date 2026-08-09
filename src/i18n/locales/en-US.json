@@ -42,7 +42,7 @@
     "enableGyro": "Enable motion parallax",
     "enableCamera": "Enable camera gestures",
     "gyroHint": "Tap to allow motion — tilt your phone for real parallax",
-    "cameraHint": "Hold your hand up to the front camera, pinch a face with thumb + index, drag toward the turn and release to twist that layer",
+    "cameraHint": "Open the rear camera, pinch a face with thumb + index, hold still to lock the whole face, turn your fingers to twist it, and move your hand away from the camera to unlock",
     "cameraDenied": "No camera access — switched to touch control",
     "hud": {
       "time": "TIME",
@@ -66,8 +66,9 @@
       "reset": "Reset",
       "mode": "Switch mode"
     },
-    "experimentalSwipe": "Pinch a face with thumb + index (the face lights up when grabbed), drag the way you want it to turn, then release to twist that layer (experimental — no depth data, tracking may wobble)",
-    "pinchGrab": "Face grabbed · drag then release to twist",
+    "experimentalSwipe": "Pinch a face → hold still to lock the whole face → turn your fingers to twist it; move your hand away from the camera to unlock (experimental — no depth, uses hold-to-lock)",
+    "pinchHold": "Pinch and hold still to lock the face",
+    "faceLocked": "Face locked · turn to twist, move away to unlock",
     "solvedTitle": "Solved!",
     "solvedTime": "Time",
     "solvedMoves": "Moves",
