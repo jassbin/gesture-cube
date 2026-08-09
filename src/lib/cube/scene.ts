@@ -217,33 +217,49 @@ export class CubeScene {
     dyN: number,
   ): Move | null {
     if (Math.hypot(dxN, dyN) < 0.02) return null;
-    // Grabbing a face turns THAT face's layer (like grabbing a real cube
-    // face and spinning it). The drag direction only chooses cw vs ccw:
-    // we project the drag onto the screen-tangent that runs "around" the
-    // face and use its sign.
+    // The two world axes tangent to this face (perpendicular to its normal).
+    const tangents: THREE.Vector3[] =
+      axis === "x"
+        ? [new THREE.Vector3(0, 1, 0), new THREE.Vector3(0, 0, 1)]
+        : axis === "y"
+          ? [new THREE.Vector3(1, 0, 0), new THREE.Vector3(0, 0, 1)]
+          : [new THREE.Vector3(1, 0, 0), new THREE.Vector3(0, 1, 0)];
+    // Camera basis so we can see how each tangent looks on screen.
+    const right = new THREE.Vector3();
+    const up = new THREE.Vector3();
+    this.camera.matrixWorld.extractBasis(right, up, new THREE.Vector3());
+    const drag2 = new THREE.Vector2(dxN, -dyN); // screen drag (y up)
+
+    // Project each world tangent to screen and see how strongly the drag
+    // follows it. The dominant tangent + drag sign gives a reliable direction
+    // that flips correctly when you drag the other way.
+    let bestAmt = 0;
+    let bestTangent = tangents[0];
+    let bestSign = 1;
+    for (const tw of tangents) {
+      const ts = new THREE.Vector2(tw.dot(right), tw.dot(up)).normalize();
+      const amt = drag2.dot(ts); // signed projection of drag onto this tangent
+      if (Math.abs(amt) > Math.abs(bestAmt)) {
+        bestAmt = amt;
+        bestTangent = tw;
+        bestSign = Math.sign(amt) || 1;
+      }
+    }
+    // rotation axis = faceNormal × tangent (a cube axis); its sign, combined
+    // with the drag sign along that tangent, sets clockwise vs counter.
     const nWorld = new THREE.Vector3(
       axis === "x" ? sign : 0,
       axis === "y" ? sign : 0,
       axis === "z" ? sign : 0,
     );
-    const right = new THREE.Vector3();
-    const up = new THREE.Vector3();
-    this.camera.matrixWorld.extractBasis(right, up, new THREE.Vector3());
-    const drag = right
-      .multiplyScalar(dxN)
-      .add(up.multiplyScalar(-dyN))
-      .normalize();
-    // rotation about the face normal: sign from (nWorld × drag)·nWorld is 0,
-    // so instead take the component of (nWorld × drag) along nWorld's axis via
-    // the standard twist: rot = nWorld × drag, then read its projection.
-    const rot = new THREE.Vector3().crossVectors(nWorld, drag);
-    // dominant component should be along the face axis for a face spin
-    const rotSign =
+    const rotAxis = new THREE.Vector3().crossVectors(nWorld, bestTangent);
+    const rotSignRaw =
       axis === "x"
-        ? Math.sign(rot.x) || 1
+        ? rotAxis.x
         : axis === "y"
-          ? Math.sign(rot.y) || 1
-          : Math.sign(rot.z) || 1;
+          ? rotAxis.y
+          : rotAxis.z;
+    const rotSign = (Math.sign(rotSignRaw) || 1) * bestSign;
     return this.axisLayerToMove(axis, sign, rotSign);
   }
 
