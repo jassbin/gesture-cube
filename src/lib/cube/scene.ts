@@ -230,50 +230,31 @@ export class CubeScene {
     dyN: number,
   ): Move | null {
     if (Math.hypot(dxN, dyN) < 0.02) return null;
-    // The two world axes tangent to this face (perpendicular to its normal).
-    const tangents: THREE.Vector3[] =
-      axis === "x"
-        ? [new THREE.Vector3(0, 1, 0), new THREE.Vector3(0, 0, 1)]
-        : axis === "y"
-          ? [new THREE.Vector3(1, 0, 0), new THREE.Vector3(0, 0, 1)]
-          : [new THREE.Vector3(1, 0, 0), new THREE.Vector3(0, 1, 0)];
-    // Camera basis so we can see how each tangent looks on screen.
-    const right = new THREE.Vector3();
-    const up = new THREE.Vector3();
-    this.camera.matrixWorld.extractBasis(right, up, new THREE.Vector3());
-    const drag2 = new THREE.Vector2(dxN, -dyN); // screen drag (y up)
-
-    // Project each world tangent to screen and see how strongly the drag
-    // follows it. The dominant tangent + drag sign gives a reliable direction
-    // that flips correctly when you drag the other way.
-    let bestAmt = 0;
-    let bestTangent = tangents[0];
-    let bestSign = 1;
-    for (const tw of tangents) {
-      const ts = new THREE.Vector2(tw.dot(right), tw.dot(up)).normalize();
-      const amt = drag2.dot(ts); // signed projection of drag onto this tangent
-      if (Math.abs(amt) > Math.abs(bestAmt)) {
-        bestAmt = amt;
-        bestTangent = tw;
-        bestSign = Math.sign(amt) || 1;
-      }
-    }
-    // rotation axis = faceNormal × tangent (a cube axis); its sign, combined
-    // with the drag sign along that tangent, sets clockwise vs counter.
+    // Grab a face, drag a direction → the layer rotates about the axis
+    // perpendicular to both the face normal and the drag (exactly like pushing
+    // an edge of a real cube). This is symmetric for every face, so left AND
+    // right faces turn, and dragging the opposite way flips the direction.
     const nWorld = new THREE.Vector3(
       axis === "x" ? sign : 0,
       axis === "y" ? sign : 0,
       axis === "z" ? sign : 0,
     );
-    const rotAxis = new THREE.Vector3().crossVectors(nWorld, bestTangent);
-    const rotSignRaw =
-      axis === "x"
-        ? rotAxis.x
-        : axis === "y"
-          ? rotAxis.y
-          : rotAxis.z;
-    const rotSign = (Math.sign(rotSignRaw) || 1) * bestSign;
-    return this.axisLayerToMove(axis, sign, rotSign);
+    const right = new THREE.Vector3();
+    const up = new THREE.Vector3();
+    this.camera.matrixWorld.extractBasis(right, up, new THREE.Vector3());
+    // world-space drag along the camera's screen axes
+    const drag = right
+      .clone()
+      .multiplyScalar(dxN)
+      .add(up.clone().multiplyScalar(-dyN))
+      .normalize();
+    const rot = new THREE.Vector3().crossVectors(nWorld, drag);
+    const axisInfo = this.snapAxis(rot);
+    if (!axisInfo) return null;
+    const { axis: rAxis, sign: rotSign } = axisInfo;
+    // the layer to turn is the grabbed face's coordinate on that rotation axis
+    const layer = rAxis === axis ? sign : sign;
+    return this.axisLayerToMove(rAxis, layer, rotSign);
   }
 
   // Highlight the whole outer face the pinch is grabbing. We sample several
