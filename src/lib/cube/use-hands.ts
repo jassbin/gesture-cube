@@ -210,6 +210,9 @@ export function useHandTracking(cbs: Callbacks) {
       } else {
         prevPalm.current = null;
         dragRef.current = null;
+        pinchState.current = false;
+        smThumb.current = null;
+        smIndex.current = null;
         cbRef.current.onFrame?.({
           present: false,
           x: 0.5,
