@@ -310,7 +310,14 @@ export class CubeScene {
     thumbY: number,
     indexX: number,
     indexY: number,
+    freeze = false,
   ): boolean {
+    // When frozen (face locked), keep the current face and only refresh the
+    // two touched cubes — no re-voting, so the locked face never jumps.
+    if (freeze && this.hlKey) {
+      this.refreshTips(thumbX, thumbY, indexX, indexY);
+      return true;
+    }
     const voted = this.voteFace(
       this.pinchSamples(thumbX, thumbY, indexX, indexY),
     );
