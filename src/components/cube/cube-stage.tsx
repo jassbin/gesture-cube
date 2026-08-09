@@ -17,6 +17,7 @@ import type { Move } from "@/lib/cube/model";
 import { applyMove } from "@/lib/cube/model";
 import { HandSkeleton } from "./hand-skeleton";
 import { HudChips } from "./hud-chips";
+import { GestureIntro } from "./gesture-intro";
 import { SolvedSheet } from "./solved-sheet";
 import { cn } from "@/utils/utils";
 
