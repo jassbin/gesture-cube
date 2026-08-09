@@ -1,7 +1,6 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import type { Face } from "@/lib/cube/model";
 
 export type CamStatus =
   | "idle"
