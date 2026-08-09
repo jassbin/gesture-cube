@@ -414,19 +414,6 @@ export class CubeScene {
     }
   }
 
-  // FREE-preview: show ONLY the two touched cubes, no whole-face highlight.
-  showTipsOnly(
-    thumbX: number,
-    thumbY: number,
-    indexX: number,
-    indexY: number,
-    depth = 1,
-  ) {
-    this.clearFaceBodies(); // drop any face glow
-    this.faceHist = [];
-    this.refreshTips(thumbX, thumbY, indexX, indexY, depth);
-  }
-
   // Select a cube along the ray by depth. hits[] is sorted front→back.
   // Thresholds are generous so a modest hand pull-back reaches inner layers.
   private bodyAtDepth(nx: number, ny: number, depth: number): THREE.Mesh | null {
