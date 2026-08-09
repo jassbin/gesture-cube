@@ -154,33 +154,63 @@ export function CubeStage() {
   );
 
   const onFingerTwist = useCallback(
-    (twist: { startX: number; startY: number; dx: number; dy: number }) => {
+  // Live 1:1 finger rotation of the LOCKED face.
+  const liveActiveRef = useRef(false);
+  const liveAngleRef = useRef(0);
+  const onFingerRotate = useCallback(
+    (delta: number) => {
       if (mode !== "gesture" || scramblingRef.current) return;
       const scene = sceneRef.current;
       if (!scene) return;
-      // A twist is only allowed on a LOCKED face. grabbedFace is set only
-      // while a face is locked, so no lock = no twist, and you can only turn
-      // the exact face that is currently locked (never any other face).
       const face = grabbedFace.current;
       if (!face) return;
-      const move = scene.solveTwistFromFace(
-        face.axis,
-        face.sign,
-        face.lyr,
-        twist.dx,
-        twist.dy,
-      );
-      if (!move) return;
-      showFlash("twist");
-      runTurn(move);
+      // Map the on-screen finger angle to a rotation about the grabbed face's
+      // normal axis. Sign flips per face so it always tracks the fingers.
+      const angle = delta * face.sign;
+      if (!liveActiveRef.current) {
+        scene.liveTurnStart(face.axis, face.sign);
+        liveActiveRef.current = true;
+      }
+      liveAngleRef.current = angle;
+      scene.liveTurnUpdate(angle);
     },
-    [mode, runTurn, showFlash],
+    [mode],
   );
+
+  const onFingerRotateEnd = useCallback(() => {
+    const scene = sceneRef.current;
+    if (!scene || !liveActiveRef.current) return;
+    liveActiveRef.current = false;
+    const moves = scene.liveTurnEnd(liveAngleRef.current);
+    liveAngleRef.current = 0;
+    if (moves.length > 0) {
+      showFlash("twist");
+      // visual already snapped; mirror the same turns into the logical state
+      moves.forEach((m) => {
+        const r = gameRef.current.applyLogical(m);
+        if (r.solved) {
+          memory
+            .reportAction({
+              content: `Solved the cube in ${r.result?.moves} moves`,
+              event_type: "solve_cube",
+              page: "play",
+              metadata: {
+                type: "cube_solve",
+                timeMs: r.result?.timeMs,
+                moves: r.result?.moves,
+              },
+            })
+            .catch(() => {});
+        }
+      });
+    }
+  }, [showFlash]);
 
   const hands = useHandTracking({
     onFrame: setFrame,
     onSpin,
-    onFingerTwist,
+    onFingerRotate,
+    onFingerRotateEnd,
   });
 
   // ---- live face highlight while pinching ----
