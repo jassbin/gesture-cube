@@ -344,6 +344,12 @@ export class CubeScene {
     // When frozen (face locked), keep the current face and only refresh the
     // two touched cubes — no re-voting, so the locked face never jumps.
     if (freeze && this.hlKey) {
+      // strong locked-face glow across all 9 cubies so "locked" reads clearly
+      for (const body of this.hlBodies) {
+        const m = body.material as THREE.MeshStandardMaterial;
+        m.emissive.setHex(0xff8c00);
+        m.emissiveIntensity = 0.95;
+      }
       this.refreshTips(thumbX, thumbY, indexX, indexY);
       return true;
     }
