@@ -37,7 +37,9 @@ export function CubeStage() {
   const [displayTime, setDisplayTime] = useState("0.00");
   const game = useCubeGame();
   const gameRef = useRef(game);
-  gameRef.current = game;
+  useEffect(() => {
+    gameRef.current = game;
+  });
 
   // ---- Three.js scene lifecycle ----
   useEffect(() => {
@@ -61,10 +63,6 @@ export function CubeStage() {
       setDisplayTime(formatTime(Date.now() - start));
     }, 33);
     return () => clearInterval(id);
-  }, [game.status]);
-
-  useEffect(() => {
-    if (game.status === "idle") setDisplayTime("0.00");
   }, [game.status]);
 
   // ---- gyro parallax ----
@@ -150,6 +148,7 @@ export function CubeStage() {
     queueRef.current = [];
     scramblingRef.current = false;
     gameRef.current.reset();
+    setDisplayTime("0.00");
     // rebuild scene to solved
     if (canvasRef.current) {
       sceneRef.current?.dispose();
