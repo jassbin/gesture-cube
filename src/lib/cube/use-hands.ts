@@ -16,6 +16,8 @@ export type HandFrame = {
   landmarks: { x: number; y: number }[];
   // true while thumb + index are pinched together (grabbing a face)
   pinching: boolean;
+  // true once a pinch has held still long enough to lock the whole face
+  locked: boolean;
   // pinch midpoint in mirrored screen space (0..1), valid while pinching
   pinchX: number;
   pinchY: number;
@@ -77,6 +79,12 @@ export function useHandTracking(cbs: Callbacks) {
   const pinchState = useRef(false);
   const smThumb = useRef<{ x: number; y: number } | null>(null);
   const smIndex = useRef<{ x: number; y: number } | null>(null);
+  // FREE / LOCKED face state machine
+  const lockState = useRef<"free" | "locked">("free");
+  const lockSpan = useRef(0.15);
+  const stillSince = useRef(0);
+  const prevMid = useRef<{ x: number; y: number } | null>(null);
+  const lockTwistStart = useRef<{ x: number; y: number } | null>(null);
 
   const stop = useCallback(() => {
     runningRef.current = false;
@@ -268,7 +276,7 @@ export function useHandTracking(cbs: Callbacks) {
       setStatus("requesting");
       try {
         const stream = await navigator.mediaDevices.getUserMedia({
-          video: { facingMode: { ideal: "user" } },
+          video: { facingMode: { ideal: "environment" } },
           audio: false,
         });
         streamRef.current = stream;
