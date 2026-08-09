@@ -164,8 +164,9 @@ export function CubeStage() {
       const face = grabbedFace.current;
       if (!face) return;
       // Map the on-screen finger angle to a rotation about the grabbed face's
-      // normal axis. Sign flips per face so it always tracks the fingers.
-      const angle = delta * face.sign;
+      // normal axis. Negated so a CLOCKWISE finger turn reads as a clockwise
+      // face turn (screen y is down, so the raw atan2 delta is inverted).
+      const angle = -delta * face.sign;
       if (!liveActiveRef.current) {
         scene.liveTurnStart(face.axis, face.sign);
         liveActiveRef.current = true;
