@@ -6,6 +6,7 @@ import { Camera, RotateCcw, Shuffle, Hand, Pointer } from "lucide-react";
 import { toast } from "sonner";
 import { memory } from "@eazo/sdk";
 import { CubeScene } from "@/lib/cube/scene";
+import { request } from "@/lib/api/request";
 import { useGyroParallax } from "@/lib/cube/use-gyro";
 import {
   useHandTracking,
