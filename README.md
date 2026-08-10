@@ -2,8 +2,10 @@
 
 用手机后置摄像头,靠**手势**在空中操控一个 3D 魔方 —— 张开手掌拖动整体旋转,两指捏合抵住某个面并停顿即可锁定,再转动手指就能 1:1 拧动这一面。
 
-> **在线预览**:<https://3000-ilrnqbngax4td61x2tt3k.e2b.app>
-> (临时沙盒地址,需允许摄像头与动作权限;沙盒关闭后失效。)
+> **🌐 在线体验**:<https://gesture-cube-d5c0aace.eazo.dev>
+> (正式地址,长期有效;需允许摄像头与动作权限。)
+>
+> 临时沙盒预览:<https://3000-ilrnqbngax4td61x2tt3k.e2b.app>(沙盒关闭后失效)
 >
 > 🌏 **English version below** → [English](#-gesture-cube-english)
 
@@ -212,8 +214,10 @@ src/
 
 Control a 3D Rubik's Cube in mid-air with **hand gestures** using your phone's rear camera — open your palm and drag to rotate the whole cube, pinch two fingers onto a face and hold to lock it, then twist your fingers to turn that face 1:1.
 
-> **Live demo**: <https://3000-ilrnqbngax4td61x2tt3k.e2b.app>
-> (Temporary sandbox URL; requires camera + motion permissions. Expires when the sandbox stops.)
+> **🌐 Live demo**: <https://gesture-cube-d5c0aace.eazo.dev>
+> (Stable production URL; requires camera + motion permissions.)
+>
+> Temporary sandbox: <https://3000-ilrnqbngax4td61x2tt3k.e2b.app> (expires when the sandbox stops)
 
 ## ✨ How to play
 
