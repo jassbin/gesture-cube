@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="360" height="240" viewBox="0 0 360 240" font-family="system-ui,Segoe UI,Roboto,sans-serif">
+  <rect width="360" height="240" rx="16" fill="#0d1117"/>
+  <text x="20" y="34" fill="#58a6ff" font-size="15" font-weight="700">① 张开手掌 · 整体旋转</text>
+  <!-- cube -->
+  <g transform="translate(120,70)">
+    <polygon points="0,40 60,10 120,40 60,70" fill="#f0b429"/>
+    <polygon points="0,40 0,110 60,140 60,70" fill="#d64545"/>
+    <polygon points="120,40 120,110 60,140 60,70" fill="#3f9142"/>
+    <g stroke="#0d1117" stroke-width="2" opacity="0.8">
+      <line x1="20" y1="30" x2="80" y2="60"/><line x1="40" y1="20" x2="100" y2="50"/>
+      <line x1="20" y1="52" x2="20" y2="122"/><line x1="40" y1="64" x2="40" y2="134"/>
+      <line x1="80" y1="52" x2="80" y2="122"/><line x1="100" y1="64" x2="100" y2="134"/>
+    </g>
+  </g>
+  <!-- translucent hand silhouette -->
+  <g transform="translate(60,120)" fill="#00ff88" opacity="0.28">
+    <path d="M30 60 q-14 4 -18 -6 q-2 -8 6 -10 l16 -3 M40 30 q-2 -22 6 -22 q7 0 6 20
+             M55 26 q0 -26 8 -26 q7 0 6 26 M70 30 q2 -24 9 -22 q7 2 4 24
+             M84 40 q6 -18 12 -14 q6 4 0 18 Z" />
+    <path d="M28 40 q0 30 22 40 q30 12 46 -6 q10 -12 4 -34 q-4 -16 -20 -20
+             q-20 -5 -36 4 q-14 8 -16 16 Z"/>
+  </g>
+  <!-- motion arrows -->
+  <g stroke="#58a6ff" stroke-width="3" fill="none" opacity="0.9">
+    <path d="M250 120 q40 -10 40 20" marker-end="url(#a)"/>
+    <path d="M110 190 q-40 10 -40 -20" marker-end="url(#a)"/>
+  </g>
+  <defs><marker id="a" markerWidth="10" markerHeight="10" refX="6" refY="3" orient="auto">
+    <path d="M0,0 L6,3 L0,6 Z" fill="#58a6ff"/></marker></defs>
+  <text x="20" y="222" fill="#8b949e" font-size="12">手指点住魔方拖动 → 整个魔方跟着手转,显示半透明手影</text>
+</svg>
