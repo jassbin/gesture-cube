@@ -27,11 +27,9 @@ type Mode = "gesture" | "touch";
 /** Persist a solved result to the DB via the internal API (fire-and-forget). */
 function saveSolve(timeMs: number, moves: number, mode: Mode) {
   if (!Number.isFinite(timeMs) || timeMs <= 0 || !moves) return;
-  request("/api/records", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ timeMs: Math.round(timeMs), moves, mode }),
-  }).catch((err) => console.error("[saveSolve] failed", err));
+  createRecord({ timeMs: Math.round(timeMs), moves, mode }).catch((err) =>
+    console.error("[saveSolve] failed", err),
+  );
 }
 
 export function CubeStage() {
