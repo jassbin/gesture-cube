@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="360" height="240" viewBox="0 0 360 240" font-family="system-ui,Segoe UI,Roboto,sans-serif">
+  <rect width="360" height="240" rx="16" fill="#0d1117"/>
+  <text x="20" y="34" fill="#ffd54a" font-size="15" font-weight="700">② 两指捏合 · 选中一个面</text>
+  <g transform="translate(120,70)">
+    <polygon points="0,40 60,10 120,40 60,70" fill="#f0b429"/>
+    <polygon points="0,40 0,110 60,140 60,70" fill="#d64545"/>
+    <!-- highlighted front-right face -->
+    <polygon points="120,40 120,110 60,140 60,70" fill="#3f9142" stroke="#ffd54a" stroke-width="4"/>
+    <g stroke="#0d1117" stroke-width="2" opacity="0.8">
+      <line x1="80" y1="52" x2="80" y2="122"/><line x1="100" y1="64" x2="100" y2="134"/>
+      <line x1="70" y1="70" x2="120" y2="63"/><line x1="63" y1="95" x2="120" y2="87"/>
+    </g>
+  </g>
+  <!-- two fingertip dots -->
+  <circle cx="215" cy="120" r="13" fill="#ffd54a"/><circle cx="215" cy="120" r="5" fill="#fff"/>
+  <circle cx="235" cy="150" r="13" fill="#ffd54a"/><circle cx="235" cy="150" r="5" fill="#fff"/>
+  <line x1="215" y1="120" x2="235" y2="150" stroke="#ffd54a" stroke-width="2" stroke-dasharray="4 3"/>
+  <text x="20" y="222" fill="#8b949e" font-size="12">拇指 + 食指两点落在同一面上 → 高亮选中最靠前的这一面</text>
+</svg>

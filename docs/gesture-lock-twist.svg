@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="360" height="240" viewBox="0 0 360 240" font-family="system-ui,Segoe UI,Roboto,sans-serif">
+  <rect width="360" height="240" rx="16" fill="#0d1117"/>
+  <text x="20" y="34" fill="#ff8c00" font-size="15" font-weight="700">③ 停顿锁定 · 转手指拧这一面</text>
+  <g transform="translate(110,70)">
+    <polygon points="0,40 60,10 120,40 60,70" fill="#f0b429"/>
+    <polygon points="0,40 0,110 60,140 60,70" fill="#d64545"/>
+    <polygon points="120,40 120,110 60,140 60,70" fill="#3f9142" stroke="#ff8c00" stroke-width="4"/>
+  </g>
+  <!-- rotation arc around the locked face -->
+  <g stroke="#ff8c00" stroke-width="3" fill="none">
+    <path d="M250 70 a55 55 0 0 1 20 90" marker-end="url(#b)"/>
+  </g>
+  <circle cx="235" cy="112" r="12" fill="#ff8c00"/><circle cx="235" cy="112" r="5" fill="#fff"/>
+  <circle cx="252" cy="140" r="12" fill="#ff8c00"/><circle cx="252" cy="140" r="5" fill="#fff"/>
+  <defs><marker id="b" markerWidth="10" markerHeight="10" refX="5" refY="3" orient="auto">
+    <path d="M0,0 L6,3 L0,6 Z" fill="#ff8c00"/></marker></defs>
+  <text x="20" y="210" fill="#8b949e" font-size="12">捏合后停顿 → 锁定(变橙);两指转多少,面就 1:1 转多少</text>
+  <text x="20" y="228" fill="#8b949e" font-size="12">松开手指 → 面平滑吸附到最近 90°;张开手指 → 解锁换面</text>
+</svg>
