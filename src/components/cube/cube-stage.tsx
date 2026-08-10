@@ -24,6 +24,16 @@ import { cn } from "@/utils/utils";
 
 type Mode = "gesture" | "touch";
 
+/** Persist a solved result to the DB via the internal API (fire-and-forget). */
+function saveSolve(timeMs: number, moves: number, mode: Mode) {
+  if (!Number.isFinite(timeMs) || timeMs <= 0 || !moves) return;
+  request("/api/records", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ timeMs: Math.round(timeMs), moves, mode }),
+  }).catch((err) => console.error("[saveSolve] failed", err));
+}
+
 export function CubeStage() {
   const { t, i18n } = useTranslation();
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -38,6 +48,10 @@ export function CubeStage() {
   const scramblingRef = useRef(false);
 
   const [mode, setMode] = useState<Mode>("touch");
+  const modeRef = useRef<Mode>("touch");
+  useEffect(() => {
+    modeRef.current = mode;
+  }, [mode]);
   // Show the how-to / permissions card automatically on first load.
   const [showIntro, setShowIntro] = useState(true);
   const [frame, setFrame] = useState<HandFrame | null>(null);
