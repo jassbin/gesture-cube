@@ -89,6 +89,23 @@ src/
 
 ---
 
+## 🚢 一键部署到 Vercel
+
+本项目是标准 Next.js 应用,可直接部署到 [Vercel](https://vercel.com):
+
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/jassbin/gesture-cube)
+
+手动方式:
+
+1. 登录 Vercel → **Add New… → Project** → 导入 `jassbin/gesture-cube` 仓库。
+2. Framework 会自动识别为 **Next.js**,构建命令 `next build`、输出目录默认即可,无需额外配置。
+3. 点击 **Deploy**,几十秒后即可获得一个 `https://<项目名>.vercel.app` 的正式地址。
+
+> 💡 摄像头手势依赖 HTTPS —— Vercel 默认提供 HTTPS,因此部署后手势功能可直接使用。
+> 若使用了 Eazo 平台相关能力,可在 Vercel 项目的 **Settings → Environment Variables** 里补充对应环境变量(见 `.env.example`)。
+
+---
+
 ## 📄 许可
 
-仅供学习与演示使用。
+本项目基于 [MIT License](./LICENSE) 开源。
