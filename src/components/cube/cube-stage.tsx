@@ -134,6 +134,7 @@ export function CubeStage() {
                 },
               })
               .catch(() => {});
+            saveSolve(r.result?.timeMs ?? 0, r.result?.moves ?? 0, modeRef.current);
           }
         }
         // drain scramble queue
