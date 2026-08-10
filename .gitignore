@@ -189,3 +189,4 @@ dist
 
 # End of https://www.toptal.com/developers/gitignore/api/nextjs,node,linux
 /generated/prisma
+public/gesture-cube-source.zip
