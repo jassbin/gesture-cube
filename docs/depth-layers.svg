@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="360" height="240" viewBox="0 0 360 240" font-family="system-ui,Segoe UI,Roboto,sans-serif">
+  <rect width="360" height="240" rx="16" fill="#0d1117"/>
+  <text x="20" y="30" fill="#a371f7" font-size="15" font-weight="700">🔮 未来:深度分层(原生 App)</text>
+  <!-- three depth layers -->
+  <g>
+    <rect x="60" y="70" width="70" height="90" rx="6" fill="#3f9142" opacity="0.35"/>
+    <text x="72" y="120" fill="#8b949e" font-size="11">后层</text>
+    <rect x="120" y="80" width="70" height="90" rx="6" fill="#f0b429" opacity="0.55"/>
+    <text x="132" y="130" fill="#0d1117" font-size="11">中层</text>
+    <rect x="180" y="90" width="70" height="90" rx="6" fill="#d64545" opacity="0.85"/>
+    <text x="192" y="140" fill="#fff" font-size="11">前层</text>
+  </g>
+  <!-- depth axis arrow -->
+  <line x1="270" y1="60" x2="300" y2="180" stroke="#a371f7" stroke-width="3" marker-end="url(#c)"/>
+  <text x="285" y="120" fill="#a371f7" font-size="12" transform="rotate(76 285 120)">Z 深度</text>
+  <defs><marker id="c" markerWidth="10" markerHeight="10" refX="5" refY="3" orient="auto">
+    <path d="M0,0 L6,3 L0,6 Z" fill="#a371f7"/></marker></defs>
+  <text x="20" y="212" fill="#8b949e" font-size="12">手伸得越深 → 选中越里层;真实 z 让前/中/后层都能选</text>
+  <text x="20" y="230" fill="#8b949e" font-size="12">需要 ARKit(LiDAR)/ ARCore(ToF)提供每个关键点的真实深度</text>
+</svg>
